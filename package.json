@@ -1,0 +1,46 @@
+{
+  "name": "glsl-projectron",
+  "version": "0.4.0",
+  "description": "GPU demo to evolve vertex data matching a target image",
+  "author": "Andy Hall",
+  "license": "MIT",
+  "main": "src/index.js",
+  "files": [
+    "/src"
+  ],
+  "scripts": {
+    "start": "cd demo && webpack-dev-server",
+    "build": "cd demo && set NODE_OPTIONS=--openssl-legacy-provider&& npx webpack --env.production"
+  },
+  "dependencies": {
+    "game-shell": "github:mikolalysenko/game-shell",
+    "gl-buffer": "^2.1.2",
+    "gl-fbo": "^2.0.5",
+    "gl-mat4": "^1.2.0",
+    "gl-now": "github:stackgl/gl-now",
+    "gl-shader": "^4.2.1",
+    "gl-texture2d": "^2.1.0",
+    "gl-vao": "^1.3.0",
+    "glslify": "^7.0.0"
+  },
+  "devDependencies": {
+    "glslify-loader": "^2.0.0",
+    "raw-loader": "^3.1.0",
+    "webpack": "^4.39.1",
+    "webpack-cli": "^3.3.6",
+    "webpack-dev-server": "^3.7.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fenomas/glsl-projectron.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fenomas/glsl-projectron/issues"
+  },
+  "keywords": [
+    "GLSL",
+    "GPGPU",
+    "image",
+    "projection"
+  ]
+}

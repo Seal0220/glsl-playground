@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+    <meta charset="utf-8">
+    <title>GLSL Playground</title>
+    <meta name="description" content="GLSL Playground tool hub">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            --bg-page: #0a0a0a;
+            --bg-panel: #000000;
+            --bg-card: rgb(6, 6, 6);
+            --bg-panel-soft: rgb(20, 20, 20);
+            --text-main: #ffffff;
+            --text-muted: #ffffff;
+            --text-dim: #ffffff;
+            --white-soft: rgba(255, 255, 255, 0.3);
+            --panel-line: rgba(255, 255, 255, 0.5);
+            --grid: rgba(255, 255, 255, 0.11);
+            --mono: "JetBrains Mono", "IBM Plex Mono", Consolas, monospace;
+            --sans: "Noto Sans TC", "Aptos", "Segoe UI", sans-serif;
+            --shadow: 0 28px 72px rgba(0, 0, 0, 0.76);
+        }
+
+        * { box-sizing: border-box; }
+        html, body { margin: 0; min-height: 100%; }
+        body {
+            position: relative;
+            background: var(--bg-page);
+            color: var(--text-main);
+            font: 400 14px/1.5 var(--mono);
+        }
+
+        ::selection {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+            background-size: 38px 38px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        button, input, select, textarea { font: inherit; color: inherit; }
+        button, input[type='text'], input[type='number'], select, textarea {
+            border: 1px solid var(--white-soft);
+            border-radius: 0;
+        }
+
+        button {
+            appearance: none;
+            background: transparent;
+            padding: 0.72rem 1rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background-color .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+        }
+
+        button:hover,
+        button:focus-visible {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        .button-run {
+            border-color: #2dff72;
+            background: rgba(45, 255, 114, 0.22);
+            color: #ffffff;
+            box-shadow: inset 0 0 0 1px rgba(45, 255, 114, 0.2);
+        }
+
+        .button-run:hover,
+        .button-run:focus-visible {
+            background: rgba(45, 255, 114, 0.34);
+            color: #ffffff;
+        }
+
+        .button-pause {
+            border-color: #ff9a2d;
+            background: rgba(255, 154, 45, 0.22);
+            color: #ffffff;
+            box-shadow: inset 0 0 0 1px rgba(255, 154, 45, 0.2);
+        }
+
+        .button-pause:hover,
+        .button-pause:focus-visible {
+            background: rgba(255, 154, 45, 0.34);
+            color: #ffffff;
+        }
+
+        .button-clear {
+            border-color: #ff4d4d;
+            background: rgba(255, 77, 77, 0.22);
+            color: #ffffff;
+            box-shadow: inset 0 0 0 1px rgba(255, 77, 77, 0.2);
+        }
+
+        .button-clear:hover,
+        .button-clear:focus-visible {
+            background: rgba(255, 77, 77, 0.34);
+            color: #ffffff;
+        }
+
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible {
+            outline: 2px solid #ffffff;
+            outline-offset: 2px;
+        }
+
+        input[type='text'], input[type='number'], select, textarea {
+            width: 100%;
+            background: var(--bg-panel-soft);
+            padding: 0.6rem 0.72rem;
+            transition: background-color .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease;
+        }
+
+        input[type='number'] {
+            appearance: textfield;
+            -moz-appearance: textfield;
+            padding-right: 2.9rem;
+        }
+
+        input[type='number']::-webkit-inner-spin-button,
+        input[type='number']::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .number-field {
+            position: relative;
+            width: 100%;
+        }
+
+        .number-stepper {
+            position: absolute;
+            top: 1px;
+            right: 1px;
+            bottom: 1px;
+            width: 2.2rem;
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            border-left: 1px solid var(--white-soft);
+            background: rgb(14, 14, 14);
+        }
+
+        .number-stepper button {
+            display: grid;
+            place-items: center;
+            padding: 0;
+            border: 0;
+            border-bottom: 1px solid var(--white-soft);
+            background: transparent;
+            transform: none;
+        }
+
+        .number-stepper button:last-child {
+            border-bottom: 0;
+        }
+
+        .number-stepper button::before {
+            content: "";
+            display: block;
+            width: 6px;
+            height: 6px;
+            border-right: 1px solid #ffffff;
+            border-bottom: 1px solid #ffffff;
+            transition: transform .2s ease, opacity .2s ease;
+            opacity: 0.9;
+            transform-origin: 50% 50%;
+        }
+
+        .number-stepper .step-up::before {
+            transform: translateY(2px) rotate(-135deg);
+        }
+
+        .number-stepper .step-down::before {
+            transform: translateY(-2px) rotate(45deg);
+        }
+
+        .number-stepper button:hover,
+        .number-stepper button:focus-visible {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .number-stepper button:hover::before,
+        .number-stepper button:focus-visible::before {
+            opacity: 1;
+        }
+
+        select {
+            appearance: none;
+            background-color: var(--bg-panel-soft);
+            background-image:
+                linear-gradient(45deg, transparent 50%, #ffffff 50%),
+                linear-gradient(135deg, #ffffff 50%, transparent 50%),
+                linear-gradient(to right, var(--white-soft), var(--white-soft));
+            background-position:
+                calc(100% - 20px) calc(50% - 3px),
+                calc(100% - 14px) calc(50% - 3px),
+                calc(100% - 38px) 50%;
+            background-size: 6px 6px, 6px 6px, 1px 22px;
+            background-repeat: no-repeat;
+            padding-right: 48px;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+
+        select:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: #ffffff;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+        }
+
+        select:focus-visible {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: #ffffff;
+            box-shadow: inset 0 0 0 1px var(--white-soft);
+        }
+
+        select,
+        select option,
+        select optgroup {
+            color: #ffffff;
+            background: #000000;
+            -webkit-text-fill-color: #ffffff;
+        }
+
+        select option {
+            padding: 10px 12px;
+        }
+
+        .select-native {
+            display: none !important;
+        }
+
+        .custom-select {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-select-button {
+            width: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-align: left;
+            background: var(--bg-panel-soft);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+            padding-right: 48px;
+        }
+
+        .custom-select-button::after {
+            content: "";
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            width: 8px;
+            height: 8px;
+            border-right: 1px solid #ffffff;
+            border-bottom: 1px solid #ffffff;
+            transform: translateY(-65%) rotate(45deg);
+            transition: transform .2s ease;
+        }
+
+        .custom-select-button:hover,
+        .custom-select-button:focus-visible,
+        .custom-select.is-open .custom-select-button {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #ffffff;
+            color: #ffffff;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+        }
+
+        .custom-select.is-open .custom-select-button::after {
+            transform: translateY(-20%) rotate(-135deg);
+        }
+
+        .custom-select-menu {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            z-index: 20;
+            display: grid;
+            gap: 0;
+            padding: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            background: #000000;
+            box-shadow:
+                inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+                0 0 0 1px rgba(255, 255, 255, 0.24),
+                var(--shadow);
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .custom-select-menu::before {
+            content: none;
+        }
+
+        .custom-select[hidden],
+        .custom-select-menu[hidden] {
+            display: none !important;
+        }
+
+        .custom-select-option {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.72rem 0.85rem;
+            border: 0;
+            border-bottom: 1px solid var(--white-soft);
+            text-align: left;
+            background: transparent;
+            color: #ffffff;
+            letter-spacing: 0.08em;
+            transform: none;
+            transition: background-color .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease;
+        }
+
+        .custom-select-option::after {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border: 1px solid transparent;
+            transition: border-color .2s ease, background-color .2s ease;
+        }
+
+        .custom-select-option:last-child {
+            border-bottom: 0;
+        }
+
+        .custom-select-option:hover,
+        .custom-select-option:focus-visible,
+        .custom-select-option.is-selected {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .custom-select-option.is-selected::after {
+            border-color: #ffffff;
+            background: #ffffff;
+        }
+
+        #uploadTrigger,
+        #uploadTrigger2 {
+            width: 100%;
+            justify-content: center;
+            background: var(--bg-panel-soft);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+        }
+
+        textarea { min-height: 180px; resize: vertical; }
+        textarea {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.5) rgb(10, 10, 10);
+        }
+
+        textarea::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        textarea::-webkit-scrollbar-track {
+            background: rgb(10, 10, 10);
+            border-left: 1px solid var(--white-soft);
+        }
+
+        textarea::-webkit-scrollbar-thumb {
+            background: rgb(28, 28, 28);
+            border: 1px solid rgba(255, 255, 255, 0.45);
+        }
+
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: rgb(40, 40, 40);
+            border-color: rgba(255, 255, 255, 0.7);
+        }
+
+        textarea::-webkit-scrollbar-corner {
+            background: rgb(10, 10, 10);
+        }
+
+        input[type='checkbox'] { accent-color: #ffffff; }
+        code { font-family: var(--mono); }
+
+        .shell {
+            position: relative;
+            z-index: 1;
+            width: min(1500px, 100%);
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 320px minmax(0, 1fr);
+            gap: 20px;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .sidebar, .page {
+            position: relative;
+            border: 1px solid var(--white-soft);
+            background: var(--bg-panel);
+            box-shadow: var(--shadow);
+        }
+
+        .sidebar::before,
+        .page::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 38px;
+            border-bottom: 1px solid var(--white-soft);
+            background:
+                linear-gradient(var(--white-soft), var(--white-soft)) 14px 50% / 10px 10px no-repeat,
+                linear-gradient(var(--white-soft), var(--white-soft)) 32px 50% / 10px 10px no-repeat,
+                linear-gradient(var(--white-soft), var(--white-soft)) 50px 50% / 10px 10px no-repeat,
+                linear-gradient(var(--white-soft), var(--white-soft)) 78px 50% / calc(100% - 96px) 1px no-repeat,
+                #000000;
+            pointer-events: none;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 24px;
+            height: calc(100vh - 48px);
+            padding: 58px 22px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .pill {
+            display: inline-flex;
+            width: fit-content;
+            padding: 0.15rem 0.34rem;
+            border: 1px solid var(--white-soft);
+            background: transparent;
+            color: #ffffff;
+            font-size: 12px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            transition: background-color .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease;
+        }
+
+        h1, h2, p { margin: 0; }
+        h1, h2, .nav-btn strong, button, input, select, .stat label, .card-head span:first-child {
+            font-family: var(--mono);
+        }
+
+        .sidebar p, .meta, .hint, label, textarea, .card-head span:last-child {
+            font-family: var(--sans);
+            color: var(--text-muted);
+        }
+
+        .sidebar h1 {
+            margin-top: 18px;
+            font-size: clamp(2.4rem, 4vw, 4.25rem);
+            line-height: 0.92;
+            letter-spacing: -0.06em;
+        }
+
+        .sidebar p {
+            max-width: 28ch;
+            margin-top: 18px;
+            font-size: 0.98rem;
+            line-height: 1.9;
+            color: #ffffff;
+        }
+
+        .nav { display: grid; gap: 0.65rem; }
+        .nav-btn {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.8rem;
+            width: 100%;
+            text-align: left;
+            padding: 1rem;
+            background: transparent;
+            align-items: start;
+            transition: background-color .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+        }
+
+        .nav-btn.active {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            transform: translateX(8px);
+        }
+
+        .nav-btn.active .meta,
+        .nav-btn.active strong {
+            color: #ffffff;
+        }
+
+        .nav-btn .meta,
+        .nav-btn strong,
+        .nav-no {
+            transition: color .2s ease, border-color .2s ease, background-color .2s ease, box-shadow .2s ease;
+        }
+
+        .nav-no {
+            width: 2.1rem;
+            height: 2.1rem;
+            display: grid;
+            place-items: center;
+            border: 1px solid currentColor;
+            background: transparent;
+            font: 600 12px/1 var(--mono);
+        }
+
+        .sidebar-foot {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid var(--white-soft);
+        }
+
+        .content { min-width: 0; }
+        .panel { display: none; }
+        .panel.active { display: block; animation: fade .2s ease; }
+        @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .page {
+            padding: 58px 24px 24px;
+        }
+
+        .page-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--white-soft);
+        }
+
+        .page-head h2 {
+            margin-top: 14px;
+            font-size: clamp(2rem, 4vw, 4rem);
+            line-height: 0.94;
+            letter-spacing: -0.06em;
+        }
+
+        .page-head .meta {
+            max-width: 62ch;
+            margin-top: 16px;
+            color: #ffffff;
+            font-size: 1rem;
+            line-height: 1.85;
+        }
+
+        .row { display: flex; flex-wrap: wrap; gap: 0.55rem; align-items: center; }
+        .toolbar {
+            display: grid;
+            gap: 0.7rem;
+            justify-items: end;
+        }
+
+        .action-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.55rem;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .toolbar-field {
+            display: grid;
+            gap: 0.35rem;
+            min-width: 230px;
+        }
+
+        .toolbar-field span {
+            display: block;
+        }
+
+        .grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr); gap: 1rem; align-items: start; }
+        .genmix-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr); gap: 1rem; align-items: start; }
+        .canvas-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+        .canvas-stack { display: grid; gap: 1rem; }
+        .canvas-panel { display: grid; gap: 0.85rem; }
+        .canvas-toolbar {
+            display: grid;
+            gap: 0.55rem;
+            align-items: end;
+        }
+
+        .canvas-toolbar .toolbar-field {
+            min-width: 220px;
+        }
+
+        .canvas-toolbar-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.55rem;
+            align-items: end;
+        }
+
+        .canvas-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 1rem;
+            padding-bottom: 0.85rem;
+            border-bottom: 1px solid var(--white-soft);
+        }
+
+        .canvas-meta strong {
+            display: block;
+            font-size: 1.05rem;
+            letter-spacing: 0.02em;
+        }
+        .card {
+            position: relative;
+            background: var(--bg-card);
+            border: 1px solid var(--panel-line);
+            padding: 18px;
+        }
+
+        .card-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            align-items: end;
+            margin-bottom: 1rem;
+            padding-bottom: 0.95rem;
+            border-bottom: 1px solid var(--white-soft);
+            font-weight: 600;
+        }
+
+        .card-head span:first-child,
+        .stat label,
+        label {
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            font-size: 0.72rem;
+        }
+
+        .card-head span:last-child,
+        .hint,
+        .meta {
+            font-size: 0.9rem;
+        }
+
+        .frame {
+            padding: 14px;
+            background: var(--bg-panel-soft);
+            border: 1px solid var(--white-soft);
+            transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
+        }
+
+        #view2d, #view3d {
+            width: 100%;
+            display: block;
+            margin: 0 auto;
+            border: 1px solid var(--white-soft);
+            background: #000;
+        }
+
+        .stack { display: grid; gap: 0.85rem; }
+        .control-grid { display: grid; grid-template-columns: 1fr; gap: 0.9rem; }
+        .range-pair {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .range-separator {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 18px;
+        }
+
+        .transfer-grid {
+            display: grid;
+            gap: 0.9rem;
+        }
+
+        .transfer-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.9rem;
+        }
+
+        .transfer-group {
+            display: grid;
+            gap: 0.7rem;
+            padding: 0.85rem;
+            background: rgb(10, 10, 10);
+            border: 1px solid var(--white-soft);
+        }
+
+        .transfer-group label,
+        .transfer-editor label {
+            display: block;
+            margin-bottom: 0.55rem;
+        }
+
+        .transfer-group .stack,
+        .transfer-editor .stack {
+            gap: 0.7rem;
+        }
+
+        .transfer-group button {
+            width: 100%;
+            justify-content: center;
+            background: var(--bg-panel-soft);
+        }
+
+        .transfer-editor {
+            padding: 0;
+        }
+
+        .transfer-editor textarea {
+            min-height: 220px;
+            background: rgb(6, 6, 6);
+        }
+
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.6rem; }
+        .stat {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 110px;
+            padding: 0.72rem;
+            background: var(--bg-panel-soft);
+            border: 1px solid var(--white-soft);
+            transition: background-color .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease;
+        }
+
+        .stat label { display: block; margin-bottom: 0.55rem; align-self: flex-start; }
+        .stat input {
+            border: 1px solid var(--white-soft);
+            padding: 0.6rem 0.72rem;
+            background: rgb(6, 6, 6);
+            text-align: left;
+            font-family: var(--mono);
+            font-size: 1.15rem;
+            align-self: stretch;
+            margin-top: auto;
+        }
+
+        .thumbs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; margin-top: 0.9rem; }
+        .thumb {
+            width: 100%;
+            height: 190px;
+            object-fit: contain;
+            border: 1px solid var(--white-soft);
+            background: var(--bg-panel-soft);
+        }
+
+        .sync-note { margin-top: 0.75rem; }
+        .blank-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.9fr); gap: 1rem; }
+        .blank-surface {
+            min-height: 360px;
+            border: 1px dashed var(--white-soft);
+            background:
+                linear-gradient(var(--grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+                #050505;
+            background-size: 26px 26px;
+        }
+
+        .blank-notes { display: grid; gap: 0.8rem; }
+
+        @media (max-width: 1080px) {
+            .shell { grid-template-columns: 1fr; }
+            .sidebar { position: static; height: auto; }
+            .nav { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+        }
+
+        @media (max-width: 860px) {
+            .grid, .genmix-grid, .blank-grid, .canvas-grid { grid-template-columns: 1fr; }
+            .range-pair { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
+            .transfer-actions { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 720px) {
+            .shell { padding: 12px; }
+            .sidebar, .page { padding-left: 16px; padding-right: 16px; padding-bottom: 16px; }
+            .page-head { flex-direction: column; }
+            .toolbar,
+            .action-group { justify-items: stretch; justify-content: flex-start; width: 100%; }
+            .toolbar-field { min-width: 100%; }
+            .canvas-toolbar .toolbar-field { min-width: 100%; }
+            .canvas-toolbar-row { width: 100%; }
+            .thumbs { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <aside class="sidebar">
+            <div class="pill">Tool Hub</div>
+            <div>
+                <h1>GLSL Playground</h1>
+                <p>小海豹的 GLSL 遊樂場。把視圖上傳、模型演化、參數調整和資料匯入匯出收進同一個工具頁。</p>
+            </div>
+
+            <nav class="nav" aria-label="工具頁面">
+                <button class="nav-btn active" type="button" data-panel="genmix"><span class="nav-no">01</span><span><strong>GenMix</strong><br><span class="meta">2D + 3D 整合頁</span></span></button>
+                <button class="nav-btn" type="button" data-panel="tool-blank-a"><span class="nav-no">02</span><span><strong>空白工具 02</strong><br><span class="meta">預留頁面</span></span></button>
+                <button class="nav-btn" type="button" data-panel="tool-blank-b"><span class="nav-no">03</span><span><strong>空白工具 03</strong><br><span class="meta">預留頁面</span></span></button>
+                <button class="nav-btn" type="button" data-panel="tool-blank-c"><span class="nav-no">04</span><span><strong>空白工具 04</strong><br><span class="meta">預留頁面</span></span></button>
+            </nav>
+
+            <div class="sidebar-foot hint">支援網址 hash，例如 <code>#genmix</code>、<code>#tool-blank-a</code>。</div>
+        </aside>
+
+        <main class="content">
+            <section class="panel active" data-panel="genmix">
+                <div class="page">
+                    <div class="page-head">
+                        <div>
+                            <div class="pill">Tool 01</div>
+                            <h2>GenMix</h2>
+                            <p class="meta">GenMix 用主視圖與側視圖影像去演化多邊形模型，讓你一邊調整參數、一邊觀察 3D 預覽，並直接匯入或匯出模型資料。</p>
+                        </div>
+
+                        <div class="toolbar">
+                            <input type="checkbox" id="paused" checked hidden>
+                            <div class="action-group">
+                                <button id="pauseBtn" class="button-run" type="button" data-action="toggle-run">運行</button>
+                                <button id="resetBtn" class="button-clear" type="button">清除</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="genmix-grid">
+                        <div class="canvas-stack">
+                            <div class="card">
+                                <div class="card-head"><span>視窗區</span></div>
+                                <div class="canvas-panel">
+                                    <div class="canvas-toolbar">
+                                        <div class="canvas-toolbar-row"></div>
+                                    </div>
+                                    <canvas id="view3d" width="500" height="500"></canvas>
+                                    <label class="toolbar-field">
+                                        <span>顯示模式</span>
+                                        <select id="display2dMode">
+                                            <option value="front" selected>主視角</option>
+                                            <option value="side">側視角</option>
+                                        </select>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-head"><span>視圖</span></div>
+                                <div class="thumbs">
+                                    <div class="stack">
+                                        <label>主視圖</label>
+                                        <img id="thumbMain" class="thumb" alt="主視圖縮圖">
+                                        <button id="uploadTrigger" type="button">+ 選擇主視圖</button>
+                                        <input id="imageInput" type="file" accept="image/*" hidden>
+                                    </div>
+                                    <div class="stack">
+                                        <label>側視圖</label>
+                                        <img id="thumbSide" class="thumb" alt="側視圖縮圖">
+                                        <button id="uploadTrigger2" type="button">+ 選擇側視圖</button>
+                                        <input id="imageInput2" type="file" accept="image/*" hidden>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stack">
+                            <div class="card">
+                                <div class="card-head"><span>進度 / 模型</span></div>
+                                <div class="stats">
+                                    <div class="stat"><label>多邊形數</label><input id="polys" type="text" readonly></div>
+                                    <div class="stat"><label>迭代數</label><input id="gens" type="text" readonly></div>
+                                    <div class="stat"><label>代 / 秒</label><input id="gps" type="text" readonly></div>
+                                    <div class="stat"><label>模型多邊形數</label><input id="modelPolys" type="text" readonly></div>
+                                    <div class="stat"><label>模型迭代數</label><input id="modelGens" type="text" readonly></div>
+                                    <div class="stat"><label>模型分數</label><input id="modelScore" type="text" readonly></div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-head"><span>演化參數</span></div>
+                                <div class="control-grid">
+                                    <label>每幀演化次數<select id="gensPerFrame"><option>1</option><option>10</option><option selected="true">20</option><option>50</option><option>100</option></select></label>
+                                    <label>較少多邊形容忍度<input type="number" id="preferFewer" value="0.001" min="0" max="1" step="0.001"></label>
+                                    <label>Alpha 範圍
+                                        <div class="range-pair">
+                                            <input type="number" id="minAlpha" value="0.1" min="0" max="1" step="0.01">
+                                            <span class="range-separator">~</span>
+                                            <input type="number" id="maxAlpha" value="0.5" min="0" max="1" step="0.01">
+                                        </div>
+                                    </label>
+                                    <label>調整幅度<input type="number" id="adjust" value="0.5" min="0.01" max="1" step="0.01"></label>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-head"><span>資料匯入 / 匯出</span></div>
+                                <div class="transfer-grid">
+                                    <div class="transfer-editor">
+                                        <label>資料內容</label>
+                                        <div class="stack">
+                                            <textarea id="modelData" rows="8" cols="30"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="transfer-actions">
+                                        <div class="transfer-group">
+                                            <label>匯出</label>
+                                            <div class="stack">
+                                                <button id="exportModelData" type="button">匯出資料</button>
+                                                <button id="exportModelPly" type="button">下載 PLY</button>
+                                            </div>
+                                        </div>
+                                        <div class="transfer-group">
+                                            <label>匯入</label>
+                                            <div class="stack">
+                                                <button id="importModelData" type="button">套用資料</button>
+                                                <button id="importModelPly" type="button">導入 PLY</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input id="modelPlyInput" type="file" accept=".ply,model/ply,text/plain" hidden>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel" data-panel="tool-blank-a">
+                <div class="page">
+                    <div class="page-head"><div><div class="pill">Tool 02</div><h2>空白工具 02</h2><p class="meta">預留頁面。</p></div></div>
+                    <div class="blank-grid">
+                        <div class="card"><div class="blank-surface"></div></div>
+                        <div class="blank-notes">
+                            <div class="card"><strong>目前狀態</strong><p class="meta">這頁還沒接任何功能。</p></div>
+                            <div class="card"><strong>後續擴充</strong><p class="meta">可用來補下一個工具。</p></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel" data-panel="tool-blank-b">
+                <div class="page">
+                    <div class="page-head"><div><div class="pill">Tool 03</div><h2>空白工具 03</h2><p class="meta">預留頁面。</p></div></div>
+                    <div class="blank-grid">
+                        <div class="card"><div class="blank-surface"></div></div>
+                        <div class="blank-notes">
+                            <div class="card"><strong>目前狀態</strong><p class="meta">這頁還沒接任何功能。</p></div>
+                            <div class="card"><strong>後續擴充</strong><p class="meta">可直接沿用同一套 sidebar / panel 結構補新工具。</p></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel" data-panel="tool-blank-c">
+                <div class="page">
+                    <div class="page-head"><div><div class="pill">Tool 04</div><h2>空白工具 04</h2><p class="meta">預留頁面。</p></div></div>
+                    <div class="blank-grid">
+                        <div class="card"><div class="blank-surface"></div></div>
+                        <div class="blank-notes">
+                            <div class="card"><strong>目前做法</strong><p class="meta">先用現有靜態頁分拆流程，不另外搬到 Next.js。</p></div>
+                            <div class="card"><strong>後續延伸</strong><p class="meta">若你之後要多路由或 SSR，再搬框架即可。</p></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="maker-bundle.js"></script>
+    <script>
+        (function () {
+            var navs = Array.prototype.slice.call(document.querySelectorAll('.nav-btn'));
+            var panels = Array.prototype.slice.call(document.querySelectorAll('.panel'));
+            var paused = document.getElementById('paused');
+            var pauseButtons = Array.prototype.slice.call(document.querySelectorAll('[data-action="toggle-run"]'));
+            var current = 'genmix';
+            var resumeOnReturn = false;
+            var runtimePanels = {
+                'genmix': true
+            };
+
+            function syncPauseLabel() {
+                pauseButtons.forEach(function (button) {
+                    button.textContent = paused && paused.checked ? '運行' : '暫停';
+                    button.classList.toggle('button-run', paused && paused.checked);
+                    button.classList.toggle('button-pause', paused && !paused.checked);
+                });
+            }
+
+            function setPaused(nextPaused) {
+                if (!paused) return;
+                if (paused.checked === nextPaused) return syncPauseLabel();
+                paused.checked = nextPaused;
+                paused.dispatchEvent(new Event('change', { bubbles: true }));
+                syncPauseLabel();
+            }
+
+            function validPanel(name) {
+                return panels.some(function (panel) { return panel.dataset.panel === name; }) ? name : 'genmix';
+            }
+
+            function panelFromHash() {
+                return validPanel((window.location.hash || '').replace(/^#/, ''));
+            }
+
+            function initCustomSelect(select) {
+                if (!select || select.dataset.customized === 'true') return;
+
+                select.dataset.customized = 'true';
+                select.classList.add('select-native');
+
+                var wrapper = document.createElement('div');
+                wrapper.className = 'custom-select';
+
+                var button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'custom-select-button';
+
+                var menu = document.createElement('div');
+                menu.className = 'custom-select-menu';
+                menu.hidden = true;
+
+                function syncLabel() {
+                    var selected = select.options[select.selectedIndex];
+                    button.textContent = selected ? selected.textContent : '';
+                    Array.prototype.slice.call(menu.children).forEach(function (item) {
+                        item.classList.toggle('is-selected', item.dataset.value === select.value);
+                    });
+                }
+
+                Array.prototype.slice.call(select.options).forEach(function (option) {
+                    var item = document.createElement('button');
+                    item.type = 'button';
+                    item.className = 'custom-select-option';
+                    item.textContent = option.textContent;
+                    item.dataset.value = option.value;
+                    item.addEventListener('click', function () {
+                        select.value = option.value;
+                        select.dispatchEvent(new Event('change', { bubbles: true }));
+                        wrapper.classList.remove('is-open');
+                        menu.hidden = true;
+                        syncLabel();
+                    });
+                    menu.appendChild(item);
+                });
+
+                button.addEventListener('click', function () {
+                    var nextOpen = !wrapper.classList.contains('is-open');
+                    document.querySelectorAll('.custom-select.is-open').forEach(function (openSelect) {
+                        openSelect.classList.remove('is-open');
+                        var openMenu = openSelect.querySelector('.custom-select-menu');
+                        if (openMenu) openMenu.hidden = true;
+                    });
+                    wrapper.classList.toggle('is-open', nextOpen);
+                    menu.hidden = !nextOpen;
+                });
+
+                select.addEventListener('change', syncLabel);
+
+                select.parentNode.insertBefore(wrapper, select);
+                wrapper.appendChild(button);
+                wrapper.appendChild(menu);
+                wrapper.appendChild(select);
+                syncLabel();
+            }
+
+            function initCustomSelects() {
+                document.querySelectorAll('select').forEach(initCustomSelect);
+            }
+
+            function initNumberSteppers() {
+                document.querySelectorAll('input[type="number"]').forEach(function (input) {
+                    if (!input || input.dataset.stepperReady === 'true') return;
+
+                    input.dataset.stepperReady = 'true';
+
+                    var wrapper = document.createElement('div');
+                    wrapper.className = 'number-field';
+
+                    var stepper = document.createElement('div');
+                    stepper.className = 'number-stepper';
+
+                    var up = document.createElement('button');
+                    up.type = 'button';
+                    up.className = 'step-up';
+                    up.setAttribute('aria-label', '增加數值');
+
+                    var down = document.createElement('button');
+                    down.type = 'button';
+                    down.className = 'step-down';
+                    down.setAttribute('aria-label', '減少數值');
+
+                    function step(direction) {
+                        if (direction > 0) input.stepUp();
+                        else input.stepDown();
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                        input.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+
+                    up.addEventListener('click', function () { step(1); });
+                    down.addEventListener('click', function () { step(-1); });
+
+                    input.parentNode.insertBefore(wrapper, input);
+                    wrapper.appendChild(input);
+                    stepper.appendChild(up);
+                    stepper.appendChild(down);
+                    wrapper.appendChild(stepper);
+                });
+            }
+
+            function clampNumberField(field, fallback) {
+                if (!field) return fallback;
+
+                var value = parseFloat(field.value);
+                if (!Number.isFinite(value)) value = fallback;
+
+                var min = field.min !== '' ? parseFloat(field.min) : null;
+                var max = field.max !== '' ? parseFloat(field.max) : null;
+
+                if (Number.isFinite(min)) value = Math.max(min, value);
+                if (Number.isFinite(max)) value = Math.min(max, value);
+
+                field.value = String(value);
+                return value;
+            }
+
+            function initParameterValidation() {
+                var preferFewer = document.getElementById('preferFewer');
+                var minAlpha = document.getElementById('minAlpha');
+                var maxAlpha = document.getElementById('maxAlpha');
+                var adjust = document.getElementById('adjust');
+
+                function syncAlphaRange(changedField) {
+                    var minValue = clampNumberField(minAlpha, 0.1);
+                    var maxValue = clampNumberField(maxAlpha, 0.5);
+
+                    if (minValue > maxValue) {
+                        if (changedField === minAlpha) {
+                            maxValue = minValue;
+                            maxAlpha.value = String(maxValue);
+                        } else {
+                            minValue = maxValue;
+                            minAlpha.value = String(minValue);
+                        }
+                    }
+                }
+
+                [
+                    [preferFewer, 0.001],
+                    [adjust, 0.5]
+                ].forEach(function (entry) {
+                    var field = entry[0];
+                    var fallback = entry[1];
+                    if (!field) return;
+                    ['input', 'change', 'blur'].forEach(function (eventName) {
+                        field.addEventListener(eventName, function () {
+                            clampNumberField(field, fallback);
+                        });
+                    });
+                    clampNumberField(field, fallback);
+                });
+
+                [minAlpha, maxAlpha].forEach(function (field) {
+                    if (!field) return;
+                    ['input', 'change', 'blur'].forEach(function (eventName) {
+                        field.addEventListener(eventName, function () {
+                            syncAlphaRange(field);
+                        });
+                    });
+                });
+
+                syncAlphaRange(maxAlpha);
+            }
+
+            function syncRuntime(nextPanel) {
+                var leavingRuntime = runtimePanels[current] && !runtimePanels[nextPanel];
+                var enteringRuntime = !runtimePanels[current] && runtimePanels[nextPanel];
+
+                if (leavingRuntime) {
+                    resumeOnReturn = paused && !paused.checked;
+                    setPaused(true);
+                }
+
+                if (enteringRuntime) {
+                    if (resumeOnReturn) setPaused(false);
+                    resumeOnReturn = false;
+                }
+
+                syncPauseLabel();
+            }
+
+            function activate(name, updateHash) {
+                var next = validPanel(name);
+                syncRuntime(next);
+                navs.forEach(function (nav) { nav.classList.toggle('active', nav.dataset.panel === next); });
+                panels.forEach(function (panel) { panel.classList.toggle('active', panel.dataset.panel === next); });
+                current = next;
+                window.__projectronActivePanel = current;
+                window.dispatchEvent(new CustomEvent('projectron-panel-change', { detail: { panel: current } }));
+                if (updateHash) window.location.hash = next;
+            }
+
+            navs.forEach(function (nav) {
+                nav.addEventListener('click', function () { activate(nav.dataset.panel, true); });
+            });
+
+            pauseButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    setPaused(!paused.checked);
+                });
+            });
+
+            if (paused) paused.addEventListener('change', syncPauseLabel);
+            window.addEventListener('hashchange', function () { activate(panelFromHash(), false); });
+            document.addEventListener('click', function (event) {
+                if (event.target.closest('.custom-select')) return;
+                document.querySelectorAll('.custom-select.is-open').forEach(function (openSelect) {
+                    openSelect.classList.remove('is-open');
+                    var openMenu = openSelect.querySelector('.custom-select-menu');
+                    if (openMenu) openMenu.hidden = true;
+                });
+            });
+
+            initCustomSelects();
+            initNumberSteppers();
+            initParameterValidation();
+            activate(panelFromHash(), false);
+            syncPauseLabel();
+        })();
+    </script>
+</body>
+</html>
