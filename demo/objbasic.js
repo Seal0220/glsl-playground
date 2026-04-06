@@ -71,9 +71,15 @@ var objbasicModes = {
         vertexUrl: 'shaders/objbasic-perfect-mirror.vert.glsl',
         fragmentUrl: 'shaders/objbasic-perfect-mirror.frag.glsl'
     },
+    bubble: {
+        label: 'Bubble',
+        description: '帶有虹彩邊緣與表面起伏的泡泡透明材質。',
+        vertexUrl: 'shaders/objbasic-bubble.vert.glsl',
+        fragmentUrl: 'shaders/objbasic-bubble.frag.glsl'
+    },
     glass: {
         label: 'Glass',
-        description: '乾淨透明的玻璃材質。',
+        description: '全光滑透明玻璃。',
         vertexUrl: 'shaders/objbasic-glass.vert.glsl',
         fragmentUrl: 'shaders/objbasic-glass.frag.glsl'
     },

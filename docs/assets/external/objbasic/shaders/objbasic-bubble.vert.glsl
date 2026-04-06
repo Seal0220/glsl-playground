@@ -4,7 +4,7 @@
 precision mediump float;
 #endif
 
-// Mode: Glass Smooth
+// Mode: Bubble
 #include "shaders/includes/objbasic-vertex-shared.glsl"
 
 void main(void) {
