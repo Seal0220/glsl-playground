@@ -2,11 +2,18 @@ var navs = Array.prototype.slice.call(document.querySelectorAll('.nav-btn'))
 var main = document.querySelector('.content')
 var current = 'gensolo'
 var resumeOnReturn = false
+var activationToken = 0
 var runtimePanels = {
     gensolo: true,
     genmix: true,
     genviewer: true,
     glsleditor: true
+}
+var runtimeBundles = {
+    gensolo: 'maker-bundle.js',
+    genmix: 'maker-bundle.js',
+    genviewer: 'viewer-bundle.js',
+    glsleditor: 'editor-bundle.js'
 }
 var pageCache = {}
 var pageLoads = {}
@@ -276,24 +283,26 @@ function loadPanel(name) {
 }
 
 function ensureRuntime(name) {
-    if (!runtimePanels[name]) return Promise.resolve()
-    if (runtimeLoads[name]) return runtimeLoads[name]
+    var bundle = runtimeBundles[name]
+    if (!bundle) return Promise.resolve()
+    if (runtimeLoads[bundle]) return runtimeLoads[bundle]
 
-    runtimeLoads[name] = new Promise(function (resolve, reject) {
+    runtimeLoads[bundle] = new Promise(function (resolve, reject) {
         var script = document.createElement('script')
-        script.src =
-            (name === 'gensolo' || name === 'genmix') ? 'maker-bundle.js' :
-            (name === 'genviewer') ? 'viewer-bundle.js' :
-            (name === 'glsleditor') ? 'editor-bundle.js' :
-            ''
-        script.onload = resolve
+        script.src = bundle
+        script.dataset.runtimeBundle = bundle
+        script.onload = function () {
+            script.dataset.runtimeLoaded = 'true'
+            resolve()
+        }
         script.onerror = function () {
+            delete runtimeLoads[bundle]
             reject(new Error('Failed to load runtime bundle: ' + name))
         }
         document.body.appendChild(script)
     })
 
-    return runtimeLoads[name]
+    return runtimeLoads[bundle]
 }
 
 function syncRuntimeBeforeLeave(nextPanel) {
@@ -327,17 +336,33 @@ function mountPanel(panel) {
 
 function activate(name, updateHash) {
     var next = validPanel(name)
+
+    if (updateHash) {
+        var currentHash = (window.location.hash || '').replace(/^#/, '')
+        if (currentHash !== next) {
+            window.location.hash = next
+            return Promise.resolve()
+        }
+    }
+
+    var mountedPanel = main && main.firstElementChild
+    if (current === next && mountedPanel && mountedPanel.dataset.panel === next) {
+        return Promise.resolve()
+    }
+
+    var token = ++activationToken
     syncRuntimeBeforeLeave(next)
 
     return loadPanel(next)
         .then(function (panel) {
+            if (token !== activationToken) return
             mountPanel(panel)
             navs.forEach(function (nav) { nav.classList.toggle('active', nav.dataset.panel === next) })
             current = next
-            if (updateHash) window.location.hash = next
             return ensureRuntime(next)
         })
         .then(function () {
+            if (token !== activationToken) return
             syncRuntimeAfterEnter(next)
             notifyPanelChange(next)
         })

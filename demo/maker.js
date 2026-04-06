@@ -1,6 +1,17 @@
 import { Projectron } from '../src'
 
-var $ = s => document.getElementById(s)
+function getActivePanelNode() {
+    return document.querySelector('[data-panel="' + (window.__projectronActivePanel || 'gensolo') + '"]')
+}
+
+function $(s) {
+    var panel = getActivePanelNode()
+    if (panel) {
+        var scoped = panel.querySelector('#' + s)
+        if (scoped) return scoped
+    }
+    return document.getElementById(s)
+}
 
 var panelConfigs = {
     gensolo: {
@@ -30,6 +41,7 @@ window.p = proj
 var activeTool = null
 var mainImage = null
 var sideImage = null
+var toolLoadToken = 0
 
 var paused = true
 var previewCameraMode = 'front'
@@ -61,7 +73,7 @@ function isRuntimePanelActive() {
 }
 
 function getCurrentPanelNode() {
-    return document.querySelector('[data-panel="' + getActivePanel() + '"]')
+    return getActivePanelNode()
 }
 
 function setFieldValue(id, value) {
@@ -134,9 +146,14 @@ function setSideImage(imgObj) {
 }
 
 function loadDefaultImages(config) {
+    var loadToken = ++toolLoadToken
+
     if (config.defaultMainSrc) {
         var imgMain = new Image()
-        imgMain.onload = () => { setMainImage(imgMain) }
+        imgMain.onload = () => {
+            if (loadToken !== toolLoadToken || activeTool !== getActivePanel()) return
+            setMainImage(imgMain)
+        }
         imgMain.onerror = () => {
             console.warn('主視圖預設圖片載入失敗：', config.defaultMainSrc)
         }
@@ -145,7 +162,10 @@ function loadDefaultImages(config) {
 
     if (config.defaultSideSrc) {
         var imgSide = new Image()
-        imgSide.onload = () => { setSideImage(imgSide) }
+        imgSide.onload = () => {
+            if (loadToken !== toolLoadToken || activeTool !== getActivePanel()) return
+            setSideImage(imgSide)
+        }
         imgSide.onerror = () => {
             console.warn('側視圖預設圖片載入失敗：', config.defaultSideSrc)
         }
@@ -283,6 +303,7 @@ function configureTool(panelName, forceReset) {
     if (!config) return
     if (!forceReset && activeTool === panelName) return
 
+    toolLoadToken += 1
     activeTool = panelName
     mainImage = null
     sideImage = null
