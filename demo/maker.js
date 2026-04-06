@@ -15,7 +15,7 @@ function $(s) {
 
 var panelConfigs = {
     gensolo: {
-        defaultMainSrc: './assets/images/1.png',
+        defaultMainSrc: './assets/images/seal_the_napoleon.png',
         defaultSideSrc: null
     },
     genmix: {
