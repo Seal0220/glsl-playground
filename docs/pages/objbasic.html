@@ -5,23 +5,50 @@
         <div class="pill">Tool 05</div>
         <h2>ObjBasic</h2>
         <p class="meta">Bagel Seal OBJ + GLSL Canvas 著色範例。</p>
-        <p class="">"Bagel Seal" (https://skfb.ly/ooo9L) by Jerry Bot is licensed under Creative Commons Attribution-NonCommercial (http://creativecommons.org/licenses/by-nc/4.0/).</p>
+        <p class="objbasic-license">"Bagel Seal" (https://skfb.ly/ooo9L) by Jerry Bot is licensed under Creative Commons Attribution-NonCommercial (http://creativecommons.org/licenses/by-nc/4.0/).</p>
       </div>
     </div>
 
-    <div class="card objbasic-card">
-      <div class="card-head"><span>預覽窗</span></div>
-      <div class="objbasic-toolbar">
-        <button id="objbasicReload" type="button">重新載入</button>
+    <div class="objbasic-top-grid">
+      <div class="card objbasic-card">
+        <div class="card-head"><span>預覽窗</span></div>
+        <div class="objbasic-toolbar">
+          <button id="objbasicReload" type="button">重新載入</button>
+        </div>
+        <div class="objbasic-frame-wrap">
+          <canvas
+            id="objbasicView"
+            class="objbasic-frame"
+            data-vertex-url="shaders/objbasic-standard.vert.glsl"
+            data-fragment-url="shaders/objbasic-standard.frag.glsl"
+            width="800"
+            height="720"></canvas>
+          <div id="objbasicStatsDock" class="objbasic-stats"></div>
+        </div>
       </div>
-      <div class="objbasic-frame-wrap">
-        <canvas
-          id="objbasicView"
-          class="objbasic-frame"
-          data-fragment-url="30_ObjBasic.glsl"
-          width="800"
-          height="720"></canvas>
-        <div id="objbasicStatsDock" class="objbasic-stats"></div>
+
+      <div class="objbasic-side-stack">
+        <div class="card objbasic-mode-card">
+          <div class="card-head"><span>渲染模式選擇</span></div>
+          <div class="stack">
+            <select id="objbasicModeSelect">
+              <option value="default" selected>預設</option>
+              <option value="fantasy">Fantasy</option>
+              <option value="aluminum">Aluminum</option>
+              <option value="mirror">Mirror</option>
+              <option value="glass">Glass</option>
+              <option value="fake2d">Fake 2D</option>
+              <option value="toon">Toon</option>
+              <option value="gooch">Gooch</option>
+              <option value="phong">Phong</option>
+              <option value="pbr">PBR</option>
+              <option value="clay">Clay</option>
+              <option value="xray">X-Ray</option>
+            </select>
+            <p id="objbasicModeDescription" class="meta">標準打光，保留模型原始材質與形體。</p>
+          </div>
+        </div>
+
       </div>
     </div>
 

@@ -9,10 +9,13 @@
     <script type="text/javascript" src="dist/glsl-canvas.min.js"></script>
     <style>
         body {
-            /* 頁面背景改成純黑，讓模型外圍是乾淨的黑底。 */
             display: flex;
             margin: 0;
-            background: #000;
+            background-color: #020304;
+            background-image: url('../../images/seal-world-hdri.png');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
             overflow: hidden;
         }
         #glslCanvas {
@@ -25,7 +28,13 @@
 </head>
 
 <body>
-    <canvas class="glsl-canvas" data-fragment-url="30_ObjBasic.glsl" width="800" height="600" data-textures="data/bagel_seal_atlas.png"></canvas>
+    <canvas
+        class="glsl-canvas"
+        data-vertex-url="shaders/objbasic-standard.vert.glsl"
+        data-fragment-url="shaders/objbasic-standard.frag.glsl"
+        width="800"
+        height="600"
+        data-textures="data/bagel_seal_atlas.png"></canvas>
 </body>
 
 <script>
@@ -43,8 +52,7 @@
         Methods: load, on, pause, play, toggle, setTexture, setUniform, setUniforms, destroy
         */
         var options = {
-            // 讓 canvas 自己也清成黑色，避免透明背景時露出其他顏色。
-            backgroundColor: 'rgba(0.0, 0.0, 0.0, 1.0)',
+            backgroundColor: 'rgba(0.0, 0.0, 0.0, 0.0)',
             alpha: true,
             antialias: false,
             premultipliedAlpha: false,
@@ -52,7 +60,7 @@
             mode: "mesh",
             mesh: 'data/bagel_seal_atlas.obj',
             extensions: ["OES_standard_derivatives"],
-            doubleSided: false,
+            doubleSided: true,
         };
         var canvas = document.querySelector('.glsl-canvas');
         var glsl = new glsl.Canvas(canvas, options);
@@ -88,6 +96,11 @@
             u_contactShadowStrength: 0.38,
             u_rimStrength: 0.22,
         });
+        glsl.setTexture('u_tex0', 'data/bagel_seal_atlas.png');
+        glsl.setTexture('u_texNormal', 'data/bagel_seal_atlas_normal.png');
+        glsl.setTexture('u_texRoughness', 'data/bagel_seal_atlas_metallicRoughness.png');
+        glsl.setTexture('u_envMap', '../../images/seal-world-hdri.png');
+        glsl.setUniform('u_envOffset', 0.0, 0.0);
         glsl.on('render', function () {
             stats.end();
             // execute here custom code on every raf tick
@@ -98,6 +111,7 @@
         });
         canvas.style.width = '100%';
         canvas.style.height = '100%';
+        canvas.style.background = 'transparent';
     </script>
 
 </html>

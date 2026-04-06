@@ -11,6 +11,11 @@
         --white-soft: rgba(255, 255, 255, 0.3);
         --panel-line: rgba(255, 255, 255, 0.5);
         --grid: rgba(255, 255, 255, 0.11);
+        --scrollbar-track: rgb(10, 10, 10);
+        --scrollbar-thumb: rgb(32, 32, 32);
+        --scrollbar-thumb-hover: rgb(52, 52, 52);
+        --scrollbar-border: rgba(255, 255, 255, 0.42);
+        --scrollbar-border-hover: rgba(255, 255, 255, 0.68);
         --mono: "JetBrains Mono", "IBM Plex Mono", Consolas, monospace;
         --sans: "Noto Sans TC", "Aptos", "Segoe UI", sans-serif;
         --shadow: 0 28px 72px rgba(0, 0, 0, 0.76);
@@ -18,6 +23,76 @@
 
       * {
         box-sizing: border-box;
+        scrollbar-width: thin;
+        scrollbar-color: var(--scrollbar-border) var(--scrollbar-track);
+      }
+
+      *::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+      }
+
+      *::-webkit-scrollbar-track {
+        background: var(--scrollbar-track);
+        box-shadow: inset 0 0 0 1px var(--white-soft);
+      }
+
+      *::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, rgb(46, 46, 46), var(--scrollbar-thumb));
+        border: 1px solid var(--scrollbar-border);
+      }
+
+      *::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, rgb(66, 66, 66), var(--scrollbar-thumb-hover));
+        border-color: var(--scrollbar-border-hover);
+      }
+
+      *::-webkit-scrollbar-button {
+        display: block;
+        width: 12px;
+        height: 12px;
+        background-color: var(--scrollbar-track);
+        box-shadow: inset 0 0 0 1px var(--white-soft);
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 6px 6px;
+      }
+
+      *::-webkit-scrollbar-button:single-button:vertical:decrement {
+        background-image:
+          linear-gradient(135deg, transparent 50%, #ffffff 50%),
+          linear-gradient(225deg, transparent 50%, #ffffff 50%);
+        background-position: calc(50% - 2px) 60%, calc(50% + 2px) 60%;
+      }
+
+      *::-webkit-scrollbar-button:single-button:vertical:increment {
+        background-image:
+          linear-gradient(315deg, transparent 50%, #ffffff 50%),
+          linear-gradient(45deg, transparent 50%, #ffffff 50%);
+        background-position: calc(50% - 2px) 40%, calc(50% + 2px) 40%;
+      }
+
+      *::-webkit-scrollbar-button:single-button:horizontal:decrement {
+        background-image:
+          linear-gradient(225deg, transparent 50%, #ffffff 50%),
+          linear-gradient(315deg, transparent 50%, #ffffff 50%);
+        background-position: 60% calc(50% - 2px), 60% calc(50% + 2px);
+      }
+
+      *::-webkit-scrollbar-button:single-button:horizontal:increment {
+        background-image:
+          linear-gradient(45deg, transparent 50%, #ffffff 50%),
+          linear-gradient(135deg, transparent 50%, #ffffff 50%);
+        background-position: 40% calc(50% - 2px), 40% calc(50% + 2px);
+      }
+
+      *::-webkit-scrollbar-button:hover {
+        background-color: rgb(18, 18, 18);
+        box-shadow: inset 0 0 0 1px var(--control-border-hover);
+      }
+
+      *::-webkit-scrollbar-corner {
+        background: var(--scrollbar-track);
       }
 
       html,
@@ -338,6 +413,7 @@
           var(--shadow);
         max-height: 280px;
         overflow-y: auto;
+        scrollbar-gutter: stable;
       }
 
       .custom-select-menu::before {
@@ -402,35 +478,6 @@
       textarea {
         min-height: 180px;
         resize: vertical;
-      }
-
-      textarea {
-        scrollbar-width: thin;
-        scrollbar-color: rgba(255, 255, 255, 0.5) rgb(10, 10, 10);
-      }
-
-      textarea::-webkit-scrollbar {
-        width: 12px;
-        height: 12px;
-      }
-
-      textarea::-webkit-scrollbar-track {
-        background: rgb(10, 10, 10);
-        border-left: 1px solid var(--white-soft);
-      }
-
-      textarea::-webkit-scrollbar-thumb {
-        background: rgb(28, 28, 28);
-        border: 1px solid rgba(255, 255, 255, 0.45);
-      }
-
-      textarea::-webkit-scrollbar-thumb:hover {
-        background: rgb(40, 40, 40);
-        border-color: rgba(255, 255, 255, 0.7);
-      }
-
-      textarea::-webkit-scrollbar-corner {
-        background: rgb(10, 10, 10);
       }
 
       input[type='checkbox'] {
@@ -663,6 +710,14 @@
         color: #ffffff;
         font-size: 1rem;
         line-height: 1.85;
+      }
+
+      .objbasic-license {
+        max-width: 76ch;
+        margin-top: 1.4rem;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 0.76rem;
+        line-height: 1.8;
       }
 
       .row {
@@ -1104,7 +1159,7 @@
 
       .shader-editor-host .ace_scrollbar {
         scrollbar-width: thin;
-        scrollbar-color: rgba(255, 255, 255, 0.45) rgb(10, 10, 10);
+        scrollbar-color: var(--scrollbar-border) var(--scrollbar-track);
       }
 
       .shader-editor-host .ace_scrollbar::-webkit-scrollbar,
@@ -1115,25 +1170,25 @@
 
       .shader-editor-host .ace_scrollbar::-webkit-scrollbar-track,
       .shader-status::-webkit-scrollbar-track {
-        background: rgb(10, 10, 10);
-        border-left: 1px solid var(--white-soft);
+        background: var(--scrollbar-track);
+        box-shadow: inset 0 0 0 1px var(--white-soft);
       }
 
       .shader-editor-host .ace_scrollbar::-webkit-scrollbar-thumb,
       .shader-status::-webkit-scrollbar-thumb {
-        background: rgb(28, 28, 28);
-        border: 1px solid rgba(255, 255, 255, 0.45);
+        background: linear-gradient(180deg, rgb(46, 46, 46), var(--scrollbar-thumb));
+        border: 1px solid var(--scrollbar-border);
       }
 
       .shader-editor-host .ace_scrollbar::-webkit-scrollbar-thumb:hover,
       .shader-status::-webkit-scrollbar-thumb:hover {
-        background: rgb(40, 40, 40);
-        border-color: rgba(255, 255, 255, 0.7);
+        background: linear-gradient(180deg, rgb(66, 66, 66), var(--scrollbar-thumb-hover));
+        border-color: var(--scrollbar-border-hover);
       }
 
       .shader-editor-host .ace_scrollbar-corner,
       .shader-status::-webkit-scrollbar-corner {
-        background: rgb(10, 10, 10);
+        background: var(--scrollbar-track);
       }
 
       .shader-status {
@@ -1250,26 +1305,54 @@
       }
 
       .objbasic-card {
-        width: fit-content;
+        width: 100%;
         max-width: 100%;
+      }
+
+      .objbasic-top-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+        gap: 1rem;
+        align-items: start;
+      }
+
+      .objbasic-side-stack {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .objbasic-mode-card select,
+      .objbasic-mode-card .custom-select {
+        width: 100%;
+      }
+
+      .objbasic-mode-card strong {
+        display: block;
+      }
+
+      .objbasic-status-card .shader-status {
+        min-height: 180px;
       }
 
       .objbasic-frame-wrap {
         position: relative;
-        width: fit-content;
-        max-width: 100%;
+        width: 100%;
         border: 1px solid var(--white-soft);
-        background: #000000;
+        background-color: #020304;
+        background-image: url('./images/seal-world-hdri.png');
+        background-position: calc(50% + var(--objbasic-hdri-x, 0px)) calc(50% + var(--objbasic-hdri-y, 0px));
+        background-repeat: repeat-x;
+        background-size: auto 136%;
         overflow: hidden;
         overscroll-behavior: contain;
       }
 
       .objbasic-frame {
         display: block;
-        width: min(1000px, 100%);
+        width: 100%;
         height: 720px;
         border: 0;
-        background: #000000;
+        background: transparent;
       }
 
       .objbasic-toolbar {
@@ -1294,24 +1377,16 @@
 
       .plyviewer-editor-block .transfer-actions {
         grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
-        align-items: stretch;
-      }
-
-      .plyviewer-editor-block .transfer-group {
-        height: 100%;
-      }
-
-      [data-panel="objbasic"] .plyviewer-editor-block .transfer-actions {
         align-items: start;
       }
 
-      [data-panel="objbasic"] .plyviewer-editor-block .transfer-group {
+      .plyviewer-editor-block .transfer-group {
         height: auto;
         align-content: start;
         align-self: start;
       }
 
-      [data-panel="objbasic"] .plyviewer-editor-block .transfer-group .stack {
+      .plyviewer-editor-block .transfer-group .stack {
         align-content: start;
       }
 
@@ -1326,6 +1401,15 @@
 
       #applyObjbasicShader,
       #resetObjbasicShader {
+        min-height: 44px;
+        height: 44px;
+        align-items: center;
+      }
+
+      #applyViewerShader,
+      #resetViewerShader,
+      #applyShaderEditorShader,
+      #resetShaderEditorShader {
         min-height: 44px;
         height: 44px;
         align-items: center;
@@ -1406,6 +1490,10 @@
         }
 
         .transfer-actions {
+          grid-template-columns: 1fr;
+        }
+
+        .objbasic-top-grid {
           grid-template-columns: 1fr;
         }
       }
