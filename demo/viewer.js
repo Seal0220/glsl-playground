@@ -42,16 +42,10 @@ var defaultVertexShader = [
 var defaultFragmentShader = [
     'precision mediump float;',
     'uniform sampler2D uScene;',
-    'uniform vec2 uResolution;',
-    'uniform float uTime;',
     'varying vec2 vUv;',
     '',
     'void main() {',
-    '  vec2 uv = vUv;',
-    '  vec4 scene = texture2D(uScene, uv);',
-    '  float vignette = 0.85 - 0.45 * distance(uv, vec2(0.5));',
-    '  vec3 color = scene.rgb * vignette;',
-    '  gl_FragColor = vec4(color, 1.0);',
+    '  gl_FragColor = texture2D(uScene, vUv);',
     '}'
 ].join('\n')
 
@@ -107,6 +101,12 @@ function drag(ev) {
 function stopDrag() {
     dragging = false
     returnCamera()
+}
+
+function resetCameraPose() {
+    cameraRot[0] = 0
+    cameraRot[1] = 0
+    drawNeeded = true
 }
 
 function returnCamera() {
@@ -325,7 +325,9 @@ function drawPostFX(now) {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
     gl.bindTexture(gl.TEXTURE_2D, screenTexture)
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, sourceCanvas)
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
 
     gl.useProgram(shaderProgram.handle)
     gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer)
@@ -394,6 +396,7 @@ function bindPanel() {
             var file = ev.target.files && ev.target.files[0]
             loadTextFromFile(file, text => {
                 if (proj && proj.importPLY(text)) {
+                    resetCameraPose()
                     drawNeeded = true
                 }
             })
@@ -416,6 +419,7 @@ function initializeViewerPanel() {
     bindCanvas()
     bindPanel()
     resizeCanvasSquare()
+    resetCameraPose()
     refreshEditors()
     ensurePostFX()
     if (!shaderProgram) {
