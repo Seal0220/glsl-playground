@@ -1,16 +1,18 @@
 var navs = Array.prototype.slice.call(document.querySelectorAll('.nav-btn'))
 var main = document.querySelector('.content')
-var current = 'genmix'
+var current = 'gensolo'
 var resumeOnReturn = false
 var runtimePanels = {
-    genmix: true
+    gensolo: true,
+    genmix: true,
+    plyviewer: true
 }
 var pageCache = {}
 var pageLoads = {}
 var runtimeLoads = {}
 
 function validPanel(name) {
-    return navs.some(function (nav) { return nav.dataset.panel === name }) ? name : 'genmix'
+    return navs.some(function (nav) { return nav.dataset.panel === name }) ? name : 'gensolo'
 }
 
 function panelFromHash() {
@@ -278,7 +280,10 @@ function ensureRuntime(name) {
 
     runtimeLoads[name] = new Promise(function (resolve, reject) {
         var script = document.createElement('script')
-        script.src = name === 'genmix' ? 'maker-bundle.js' : ''
+        script.src =
+            (name === 'gensolo' || name === 'genmix') ? 'maker-bundle.js' :
+            (name === 'plyviewer') ? 'viewer-bundle.js' :
+            ''
         script.onload = resolve
         script.onerror = function () {
             reject(new Error('Failed to load runtime bundle: ' + name))

@@ -1,0 +1,45 @@
+<section class="panel active" data-panel="plyviewer">
+  <div class="page">
+    <div class="page-head">
+      <div>
+        <div class="pill">Tool 03</div>
+        <h2>PLY Viewer</h2>
+        <p class="meta">上傳 PLY 模型後，直接在頁面中旋轉查看 3D 幾何。</p>
+      </div>
+    </div>
+
+    <div class="genmix-grid">
+      <div class="canvas-stack">
+        <div class="card">
+          <div class="card-head"><span>3D 視窗</span></div>
+          <div class="canvas-panel">
+            <div class="canvas-toolbar">
+              <div class="canvas-toolbar-row"></div>
+            </div>
+            <canvas id="view" width="500" height="500"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-head"><span>模型載入</span></div>
+          <div class="stack">
+            <p class="meta">支援匯入 `.ply`，載入後可用滑鼠拖曳旋轉檢視。</p>
+            <button id="loadPlyBtn" type="button">選擇 PLY</button>
+            <input id="viewModelPlyInput" type="file" accept=".ply,model/ply,text/plain" hidden>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><span>說明</span></div>
+          <div class="stack">
+            <p class="meta">此工具只做模型檢視，不做演化計算。</p>
+            <p class="meta">目前只接受檔案內原本就有的三角面（triangle faces）。</p>
+            <p class="meta">若 PLY 沒有面資料，或面不是三角形，系統不會自動補面或改寫模型。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,13 +1,13 @@
-<section class="panel active" data-panel="genmix">
+<section class="panel active" data-panel="gensolo">
   <div class="page">
     <div class="page-head">
       <div>
-        <div class="pill">Tool 02</div>
-        <h2>GenMix</h2>
+        <div class="pill">Tool 01</div>
+        <h2>GenSolo</h2>
         <div class="meta doc-intro">
-          <p>本專案為 <a href="https://github.com/fenomas/glsl-projectron" target="_blank"
-              rel="noreferrer noopener">fenomas/glsl-projectron</a> 的延伸版本。</p>
-          <p>在原本「單一視角、多邊形演化逼近影像」的基礎上，加入主視圖（正面）＋側視圖（繞 Y 軸 +90°）的雙視角，以及兩張目標圖像的幾何平均分數作為適應度。</p>
+          <p>本工具沿用 <a href="https://github.com/fenomas/glsl-projectron" target="_blank"
+              rel="noreferrer noopener">fenomas/glsl-projectron</a> 的單圖演化邏輯。</p>
+          <p>只使用一張目標圖像作為評分依據，不做雙圖混合，直接讓多邊形模型朝單一圖片逼近。</p>
         </div>
 
         <div class="meta doc-section">
@@ -21,18 +21,11 @@
                 <li>將 3D 場景投影到 2D 平面後，與目標圖片比較差異，得到分數（score）。</li>
                 <li>分數越高代表越接近目標影像。</li>
               </ul>
-              <h3>本 fork 版本中</h3>
+              <h3>此工具模式</h3>
               <ul class="doc-list">
-                <li>第一張圖片為「主視圖」（正面 Frontal View）。</li>
-                <li>第二張圖片為「側視圖」（固定繞 Y 軸 +90° 之右側 View）。</li>
-              </ul>
-              <p>每一代演化時，會同時：</p>
-              <ul class="doc-list">
-                <li>用正面 camera 畫出 scratch1，與正面參考圖比較得分 scoreFront。</li>
-                <li>用側面 camera 畫出 scratch2，與側面參考圖比較得分 scoreSide。</li>
-                <li>將兩者做幾何平均：<code>totalScore = sqrt(scoreFront * scoreSide)</code>
-                  作為最終分數。</li>
-                <li>若新分數較好，或在容忍度內且多邊形數更少，就保留這一代的突變。</li>
+                <li>只載入一張主視圖圖片。</li>
+                <li>每一代只比較單一目標圖像，不計算幾何平均混合分數。</li>
+                <li>適合先快速從單圖建立基本形體。</li>
               </ul>
             </div>
           </details>
@@ -62,6 +55,7 @@
               <select id="display2dMode">
                 <option value="front" selected>主視角</option>
                 <option value="side">側視角</option>
+                <option value="top">俯視角</option>
               </select>
             </label>
           </div>
@@ -73,14 +67,8 @@
             <div class="stack">
               <label>主視圖</label>
               <img id="thumbMain" class="thumb" alt="主視圖縮圖">
-              <button id="uploadTrigger" type="button">+ 選擇主視圖</button>
+              <button id="uploadTrigger" type="button">+ 選擇圖片</button>
               <input id="imageInput" type="file" accept="image/*" hidden>
-            </div>
-            <div class="stack">
-              <label>側視圖</label>
-              <img id="thumbSide" class="thumb" alt="側視圖縮圖">
-              <button id="uploadTrigger2" type="button">+ 選擇側視圖</button>
-              <input id="imageInput2" type="file" accept="image/*" hidden>
             </div>
           </div>
         </div>

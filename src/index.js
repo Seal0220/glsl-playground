@@ -653,6 +653,10 @@ export function Projectron(canvas, size) {
 				var faceRow = parseElementRow(faceTokens, faceElement.properties)
 				var indices = faceRow.vertex_indices || faceRow.vertex_index
 				if (!indices || indices.length < 3) continue
+				if (indices.length !== 3) {
+					console.warn('PLY import failed: only triangular faces are supported')
+					return
+				}
 				var faceRedRaw = pickDefined(faceRow.red, faceRow.r)
 				var faceGreenRaw = pickDefined(faceRow.green, faceRow.g)
 				var faceBlueRaw = pickDefined(faceRow.blue, faceRow.b)
@@ -670,19 +674,8 @@ export function Projectron(canvas, size) {
 				})
 			}
 		} else {
-			for (i = 0; i + 2 < vertices.length; i += 3) {
-				faces.push({
-					indices: [i, i + 1, i + 2],
-					r: null,
-					g: null,
-					b: null,
-					a: null,
-					hasR: false,
-					hasG: false,
-					hasB: false,
-					hasA: false
-				})
-			}
+			console.warn('PLY import failed: missing face element')
+			return
 		}
 
 		if (!faces.length) {
@@ -714,10 +707,8 @@ export function Projectron(canvas, size) {
 
 		for (i = 0; i < faces.length; i++) {
 			var face = faces[i]
-			for (var fi = 1; fi + 1 < face.indices.length; fi++) {
-				if (!appendTri(face.indices[0], face.indices[fi], face.indices[fi + 1], face)) {
-					return
-				}
+			if (!appendTri(face.indices[0], face.indices[1], face.indices[2], face)) {
+				return
 			}
 		}
 
