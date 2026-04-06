@@ -116,11 +116,8 @@ npm run build
 
 ## Credits
 
-- 原始概念與基礎實作來自 [fenomas/glsl-projectron](https://github.com/fenomas/glsl-projectron)
+- 基因演算法概念與基礎實作來自 [fenomas/glsl-projectron](https://github.com/fenomas/glsl-projectron)
 - `ObjBasic` 頁面使用的 `"Bagel Seal"` 模型作者為 Jerry Bot，授權為 CC BY-NC 4.0
 
 ## License
-
-上游專案 `fenomas/glsl-projectron` 採用 MIT License。本 repository 目前尚未附上獨立的 `LICENSE` 檔案；若要正式對外發布，建議在根目錄補上明確授權文件，以便第三方確認使用條件。
-
 網站內容與介面文字另可依 `docs/index.html` 中標示之條款管理。第三方素材仍以其原始授權為準。
