@@ -10,10 +10,11 @@ var runtimePanels = {
     glsleditor: true
 }
 var runtimeBundles = {
-    gensolo: 'maker-bundle.js',
-    genmix: 'maker-bundle.js',
-    genviewer: 'viewer-bundle.js',
-    glsleditor: 'editor-bundle.js'
+    gensolo: 'assets/bundles/maker-bundle.js',
+    genmix: 'assets/bundles/maker-bundle.js',
+    genviewer: 'assets/bundles/viewer-bundle.js',
+    glsleditor: 'assets/bundles/editor-bundle.js',
+    objbasic: 'assets/bundles/objbasic-bundle.js'
 }
 var pageCache = {}
 var pageLoads = {}
@@ -250,11 +251,22 @@ function initParameterValidation(panel) {
     syncAlphaRange(maxAlpha)
 }
 
+function initEmbeddedPanels(panel) {
+    if (!panel) return
+
+    panel.querySelectorAll('iframe[data-src]').forEach(function (frame) {
+        var target = frame.dataset.src
+        if (!target) return
+        frame.src = target
+    })
+}
+
 function initPanelEnhancements(panel) {
     initPauseButtons(panel)
     initCustomSelects(panel)
     initNumberSteppers(panel)
     initParameterValidation(panel)
+    initEmbeddedPanels(panel)
 }
 
 function createPanelFromHTML(html) {

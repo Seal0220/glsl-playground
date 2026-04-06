@@ -15,12 +15,12 @@ function $(s) {
 
 var panelConfigs = {
     gensolo: {
-        defaultMainSrc: './img/1.png',
+        defaultMainSrc: './assets/images/1.png',
         defaultSideSrc: null
     },
     genmix: {
-        defaultMainSrc: './img/1.png',
-        defaultSideSrc: './img/TS.jpg'
+        defaultMainSrc: './assets/images/1.png',
+        defaultSideSrc: './assets/images/TS.jpg'
     }
 }
 

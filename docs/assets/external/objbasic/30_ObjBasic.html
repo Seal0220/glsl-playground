@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=2,user-scalable=yes">
+    <title>GlslCanvas</title>
+    <script type="text/javascript" src="dist/stats.min.js"></script>
+    <script type="text/javascript" src="dist/glsl-canvas.min.js"></script>
+    <style>
+        body {
+            /* 頁面背景改成純黑，讓模型外圍是乾淨的黑底。 */
+            display: flex;
+            margin: 0;
+            background: #000;
+            overflow: hidden;
+        }
+        #glslCanvas {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%,-50%);
+        }
+    </style>
+</head>
+
+<body>
+    <canvas class="glsl-canvas" data-fragment-url="30_ObjBasic.glsl" width="800" height="600" data-textures="data/bagel_seal_atlas.png"></canvas>
+</body>
+
+<script>
+        /*
+        stats.js
+        */
+        var stats = new Stats();
+        stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+        document.body.appendChild(stats.dom);
+
+        /*
+        glsl-canvas.js
+        Attributes: data-fragment-url, data-vertex-url, data-fragment, data-vertex, controls, data-autoplay
+        Events: load, error, textureError, render, over, out, move, click
+        Methods: load, on, pause, play, toggle, setTexture, setUniform, setUniforms, destroy
+        */
+        var options = {
+            // 讓 canvas 自己也清成黑色，避免透明背景時露出其他顏色。
+            backgroundColor: 'rgba(0.0, 0.0, 0.0, 1.0)',
+            alpha: true,
+            antialias: false,
+            premultipliedAlpha: false,
+            preserveDrawingBuffer: false, 
+            mode: "mesh",
+            mesh: 'data/bagel_seal_atlas.obj',
+            extensions: ["OES_standard_derivatives"],
+            doubleSided: false,
+        };
+        var canvas = document.querySelector('.glsl-canvas');
+        var glsl = new glsl.Canvas(canvas, options);
+
+        // 這些 uniform 直接控制玻璃感：
+        // u_ior                 折射率，越高越像高密度玻璃
+        // u_reflectionStrength  反射強度
+        // u_refractionStrength  折射強度
+        // u_dispersion          色散強度，越高彩邊越明顯
+        // u_fresnelStrength     邊緣反射的強化倍率
+        // u_ambientStrength     Phong ambient 強度
+        // u_diffuseStrength     Phong diffuse 強度
+        // u_specularStrength    Phong specular 強度
+        // u_shininess           Phong 高光集中程度
+        // u_fillLightStrength   補光強度
+        // u_backLightStrength   背光強度
+        // u_shadowStrength      主陰影強度
+        // u_contactShadowStrength 接觸陰影強度
+        // u_rimStrength         邊緣光強度
+        glsl.setUniforms({
+            u_ior: 3.18,
+            u_reflectionStrength: 0.25,
+            u_refractionStrength: 0.95,
+            u_dispersion: 0.06,
+            u_fresnelStrength: 1.35,
+            u_ambientStrength: 0.18,
+            u_diffuseStrength: 0.87,
+            u_specularStrength: 5.2,
+            u_shininess: 120.0,
+            u_fillLightStrength: 0.75,
+            u_backLightStrength: 0.68,
+            u_shadowStrength: 3.55,
+            u_contactShadowStrength: 0.38,
+            u_rimStrength: 0.22,
+        });
+        glsl.on('render', function () {
+            stats.end();
+            // execute here custom code on every raf tick
+            stats.begin();
+        });
+        glsl.on('load', function () {
+            // glsl.pause();
+        });
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+    </script>
+
+</html>

@@ -4,18 +4,73 @@
       <div>
         <div class="pill">Tool 05</div>
         <h2>ObjBasic</h2>
-        <p class="meta">從 `glslCanvas_templateObj` 拆出的 OBJ + GLSL Canvas 範例。</p>
+        <p class="meta">Bagel Seal OBJ + GLSL Canvas 著色範例。</p>
+        <p class="">"Bagel Seal" (https://skfb.ly/ooo9L) by Jerry Bot is licensed under Creative Commons Attribution-NonCommercial (http://creativecommons.org/licenses/by-nc/4.0/).</p>
       </div>
     </div>
 
     <div class="card objbasic-card">
       <div class="card-head"><span>預覽窗</span></div>
+      <div class="objbasic-toolbar">
+        <button id="objbasicReload" type="button">重新載入</button>
+      </div>
       <div class="objbasic-frame-wrap">
-        <iframe
+        <canvas
+          id="objbasicView"
           class="objbasic-frame"
-          src="./external/objbasic/30_ObjBasic.html"
-          title="ObjBasic Preview"
-          loading="lazy"></iframe>
+          data-fragment-url="30_ObjBasic.glsl"
+          width="800"
+          height="720"></canvas>
+        <div id="objbasicStatsDock" class="objbasic-stats"></div>
+      </div>
+    </div>
+
+    <div class="plyviewer-editor-block">
+      <div class="card">
+        <div class="card-head"><span>GLSL 編輯器</span></div>
+        <div class="transfer-grid">
+          <div class="transfer-editor">
+            <div class="shader-editor-head">
+              <label>Vertex Shader</label>
+              <div class="shader-editor-actions">
+                <button id="importObjbasicVertexShader" type="button">匯入</button>
+                <button id="saveObjbasicVertexShader" type="button">保存</button>
+                <input id="objbasicVertexShaderFile" type="file" accept=".glsl,.vert,.vs,.txt,text/plain" hidden>
+              </div>
+            </div>
+            <div class="stack">
+              <div id="objbasicVertexShader" class="shader-editor-host" aria-label="ObjBasic Vertex Shader editor"></div>
+            </div>
+          </div>
+          <div class="transfer-editor">
+            <div class="shader-editor-head">
+              <label>Fragment Shader</label>
+              <div class="shader-editor-actions">
+                <button id="importObjbasicFragmentShader" type="button">匯入</button>
+                <button id="saveObjbasicFragmentShader" type="button">保存</button>
+                <input id="objbasicFragmentShaderFile" type="file" accept=".glsl,.frag,.fs,.txt,text/plain" hidden>
+              </div>
+            </div>
+            <div class="stack">
+              <div id="objbasicFragmentShader" class="shader-editor-host" aria-label="ObjBasic Fragment Shader editor"></div>
+            </div>
+          </div>
+          <div class="transfer-actions">
+            <div class="transfer-group">
+              <label>操作</label>
+              <div class="stack">
+                <button id="applyObjbasicShader" type="button">套用 GLSL</button>
+                <button id="resetObjbasicShader" type="button">重設</button>
+              </div>
+            </div>
+            <div class="transfer-group">
+              <label>狀態</label>
+              <div class="stack">
+                <pre id="objbasicShaderStatus" class="shader-status">ObjBasic GLSL 載入中。</pre>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

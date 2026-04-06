@@ -30,10 +30,11 @@ module.exports = (env) => ({
         maker: './maker.js',
         viewer: './viewer.js',
         editor: './editor.js',
+        objbasic: './objbasic.js',
     },
     output: {
         path: buildPath,
-        filename: '[name]-bundle.js',
+        filename: 'assets/bundles/[name]-bundle.js',
     },
     devServer: {
         contentBase: buildPath,
