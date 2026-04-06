@@ -13,6 +13,8 @@
     "build": "cd demo && set NODE_OPTIONS=--openssl-legacy-provider&& npx webpack --env.production"
   },
   "dependencies": {
+    "ace-builds": "^1.43.6",
+    "codemirror": "^5.65.21",
     "game-shell": "github:mikolalysenko/game-shell",
     "gl-buffer": "^2.1.2",
     "gl-fbo": "^2.0.5",

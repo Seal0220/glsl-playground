@@ -5,9 +5,9 @@
         <div class="pill">Tool 01</div>
         <h2>GenSolo</h2>
         <div class="meta doc-intro">
-          <p>本工具沿用 <a href="https://github.com/fenomas/glsl-projectron" target="_blank"
-              rel="noreferrer noopener">fenomas/glsl-projectron</a> 的單圖演化邏輯。</p>
-          <p>只使用一張目標圖像作為評分依據，不做雙圖混合，直接讓多邊形模型朝單一圖片逼近。</p>
+          <p>本專案為 <a href="https://github.com/fenomas/glsl-projectron" target="_blank"
+              rel="noreferrer noopener">fenomas/glsl-projectron</a> 的延伸版本。</p>
+          <p>使用一張目標圖像作為評分依據，讓多邊形模型朝單一圖片逼近。</p>
         </div>
 
         <div class="meta doc-section">
@@ -17,15 +17,14 @@
               <p>GLSL-Projectron 是一個使用 WebGL / GPU 的圖像重建實驗。</p>
               <ul class="doc-list">
                 <li>在 3D 空間中隨機生成大量三角形（多邊形雲）。</li>
-                <li>每一代透過突變（mutate）+ 篩選（保留分數較高者）更新多邊形。</li>
-                <li>將 3D 場景投影到 2D 平面後，與目標圖片比較差異，得到分數（score）。</li>
+                <li>每一代透過突變 + 篩選（保留分數較高者）更新多邊形。</li>
+                <li>將 3D 場景投影到 2D 平面後，與目標圖片比較差異，得到分數。</li>
                 <li>分數越高代表越接近目標影像。</li>
               </ul>
               <h3>此工具模式</h3>
               <ul class="doc-list">
-                <li>只載入一張主視圖圖片。</li>
-                <li>每一代只比較單一目標圖像，不計算幾何平均混合分數。</li>
-                <li>適合先快速從單圖建立基本形體。</li>
+                <li>需載入一張主視圖圖片。</li>
+                <li>適合快速從單圖建立基本形體。</li>
               </ul>
             </div>
           </details>
@@ -44,7 +43,7 @@
     <div class="genmix-grid">
       <div class="canvas-stack">
         <div class="card">
-          <div class="card-head"><span>視窗區</span></div>
+          <div class="card-head"><span>預覽窗</span></div>
           <div class="canvas-panel">
             <div class="canvas-toolbar">
               <div class="canvas-toolbar-row"></div>

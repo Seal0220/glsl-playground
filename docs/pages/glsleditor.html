@@ -1,0 +1,67 @@
+<section class="panel active" data-panel="glsleditor">
+  <div class="page">
+    <div class="page-head">
+      <div>
+        <div class="pill">Tool 04</div>
+        <h2>GLSL Editor</h2>
+        <p class="meta">單純的 GLSL 預覽編輯器，直接修改 shader 並即時查看畫面。</p>
+      </div>
+    </div>
+
+    <div class="card shader-preview-card">
+      <div class="card-head"><span>預覽窗</span></div>
+      <div class="canvas-panel">
+        <canvas id="shaderView" width="500" height="500"></canvas>
+      </div>
+    </div>
+
+    <div class="plyviewer-editor-block">
+      <div class="card">
+        <div class="card-head"><span>GLSL 編輯器</span></div>
+        <div class="transfer-grid">
+          <div class="transfer-editor">
+            <div class="shader-editor-head">
+              <label>Vertex Shader</label>
+              <div class="shader-editor-actions">
+                <button id="importShaderEditorVertexShader" type="button">匯入</button>
+                <button id="saveShaderEditorVertexShader" type="button">保存</button>
+                <input id="shaderEditorVertexShaderFile" type="file" accept=".glsl,.vert,.vs,.txt,text/plain" hidden>
+              </div>
+            </div>
+            <div class="stack">
+              <div id="shaderEditorVertexShader" class="shader-editor-host" aria-label="Vertex Shader editor"></div>
+            </div>
+          </div>
+          <div class="transfer-editor">
+            <div class="shader-editor-head">
+              <label>Fragment Shader</label>
+              <div class="shader-editor-actions">
+                <button id="importShaderEditorFragmentShader" type="button">匯入</button>
+                <button id="saveShaderEditorFragmentShader" type="button">保存</button>
+                <input id="shaderEditorFragmentShaderFile" type="file" accept=".glsl,.frag,.fs,.txt,text/plain" hidden>
+              </div>
+            </div>
+            <div class="stack">
+              <div id="shaderEditorFragmentShader" class="shader-editor-host" aria-label="Fragment Shader editor"></div>
+            </div>
+          </div>
+          <div class="transfer-actions">
+            <div class="transfer-group">
+              <label>操作</label>
+              <div class="stack">
+                <button id="applyShaderEditorShader" type="button">套用 GLSL</button>
+                <button id="resetShaderEditorShader" type="button">重設</button>
+              </div>
+            </div>
+            <div class="transfer-group">
+              <label>狀態</label>
+              <div class="stack">
+                <pre id="shaderEditorShaderStatus" class="shader-status">尚未編譯。</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

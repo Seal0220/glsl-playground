@@ -29,6 +29,7 @@ module.exports = (env) => ({
         app: './app-shell.js',
         maker: './maker.js',
         viewer: './viewer.js',
+        editor: './editor.js',
     },
     output: {
         path: buildPath,

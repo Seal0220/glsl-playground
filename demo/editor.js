@@ -1,4 +1,3 @@
-import { Projectron } from '../src'
 import ace from 'ace-builds/src-noconflict/ace'
 import 'ace-builds/src-noconflict/mode-glsl'
 import 'ace-builds/src-noconflict/theme-monokai'
@@ -7,28 +6,11 @@ import 'ace-builds/src-noconflict/ext-language_tools'
 var $ = s => document.getElementById(s)
 var shaderEditors = {}
 
-var size = 256
-var qSize = parseInt(new URLSearchParams(location.search).get('size'))
-if (qSize > 8) size = qSize
-
-var canvas = $('view')
-var sourceCanvas = document.createElement('canvas')
-sourceCanvas.width = 512
-sourceCanvas.height = 512
-var proj = canvas ? new Projectron(sourceCanvas, size) : null
-window.p = proj
-
+var canvas = $('shaderView')
 var gl = canvas ? canvas.getContext('webgl', { alpha: false, antialias: true }) : null
 var quadBuffer = null
-var screenTexture = null
 var shaderProgram = null
-
-var cameraRot = [0, 0]
-var drawNeeded = true
-var dragging = false
-var lastLoc = [0, 0]
-var rotScale = 1 / 150
-var cameraReturn = 0.9
+var fallbackTexture = null
 
 var defaultVertexShader = [
     'attribute vec2 aPosition;',
@@ -47,11 +29,11 @@ var defaultFragmentShader = [
     'varying vec2 vUv;',
     '',
     'void main() {',
-    '  vec2 uv = vUv;',
-    '  vec4 scene = texture2D(uScene, uv);',
-    '  float vignette = 0.85 - 0.45 * distance(uv, vec2(0.5));',
-    '  vec3 color = scene.rgb * vignette;',
-    '  gl_FragColor = vec4(color, 1.0);',
+    '    vec2 st = gl_FragCoord.xy/uResolution.xy;',
+    '    st.x *= uResolution.x/uResolution.y;',
+    '    vec3 color = vec3(0.);',
+    '    color = vec3(st.x,st.y,abs(sin(uTime)));',
+    '    gl_FragColor = vec4(color,1.0);',
     '}'
 ].join('\n')
 
@@ -59,65 +41,17 @@ function getActivePanel() {
     return window.__projectronActivePanel || 'gensolo'
 }
 
-function isViewerPanelActive() {
-    return getActivePanel() === 'genviewer'
+function isEditorPanelActive() {
+    return getActivePanel() === 'glsleditor'
 }
 
 function resizeCanvasSquare() {
     if (!canvas) return
-    var w = canvas.clientWidth || 512
-    var h = canvas.clientHeight || w
-    var side = Math.max(240, Math.floor(Math.min(w, h)))
+    var width = canvas.clientWidth || 512
+    var side = Math.max(240, Math.floor(width))
     if (canvas.width !== side || canvas.height !== side) {
         canvas.width = side
         canvas.height = side
-        sourceCanvas.width = side
-        sourceCanvas.height = side
-        drawNeeded = true
-    }
-}
-
-function getEventLoc(ev) {
-    if (typeof ev.clientX === 'number') return [ev.clientX, ev.clientY]
-    if (ev.targetTouches && ev.targetTouches.length) {
-        var touch = ev.targetTouches[0]
-        return [touch.clientX, touch.clientY]
-    }
-    return null
-}
-
-function startDrag(ev) {
-    if (!isViewerPanelActive()) return
-    ev.preventDefault()
-    dragging = true
-    lastLoc = getEventLoc(ev) || lastLoc
-}
-
-function drag(ev) {
-    if (!dragging || !isViewerPanelActive()) return
-    var loc = getEventLoc(ev)
-    if (!loc) return
-    ev.preventDefault()
-    cameraRot[0] += (loc[0] - lastLoc[0]) * rotScale
-    cameraRot[1] += (loc[1] - lastLoc[1]) * rotScale
-    lastLoc = loc
-    drawNeeded = true
-}
-
-function stopDrag() {
-    dragging = false
-    returnCamera()
-}
-
-function returnCamera() {
-    if (dragging) return
-    cameraRot.forEach((rot, i) => {
-        rot *= cameraReturn
-        cameraRot[i] = (Math.abs(rot) < 1e-4) ? 0 : rot
-        drawNeeded = true
-    })
-    if (cameraRot[0] || cameraRot[1]) {
-        requestAnimationFrame(returnCamera)
     }
 }
 
@@ -141,7 +75,7 @@ function saveTextFile(filename, content) {
 }
 
 function setShaderStatus(text) {
-    var status = $('viewerShaderStatus')
+    var status = $('shaderEditorShaderStatus')
     if (status) status.textContent = text
 }
 
@@ -192,7 +126,6 @@ function bindEditor(id) {
     editor.renderer.setShowGutter(true)
     editor.renderer.setPadding(16)
     editor.renderer.setScrollMargin(12, 12, 0, 0)
-
     editor.commands.addCommand({
         name: 'applyShader',
         bindKey: { win: 'Ctrl-Enter', mac: 'Command-Enter' },
@@ -204,9 +137,9 @@ function bindEditor(id) {
 }
 
 function bindShaderFileTools(kind, editorId, defaultFilename) {
-    var importButton = $('importViewer' + kind + 'Shader')
-    var saveButton = $('saveViewer' + kind + 'Shader')
-    var fileInput = $('viewer' + kind + 'ShaderFile')
+    var importButton = $('importShaderEditor' + kind + 'Shader')
+    var saveButton = $('saveShaderEditor' + kind + 'Shader')
+    var fileInput = $('shaderEditor' + kind + 'ShaderFile')
 
     if (importButton && fileInput && importButton.dataset.fileToolReady !== 'true') {
         importButton.dataset.fileToolReady = 'true'
@@ -267,7 +200,7 @@ function buildShaderProgram(vertexSource, fragmentSource) {
     }
 }
 
-function ensurePostFX() {
+function ensureRenderer() {
     if (!gl || quadBuffer) return
 
     quadBuffer = gl.createBuffer()
@@ -279,35 +212,45 @@ function ensurePostFX() {
         1, 1
     ]), gl.STATIC_DRAW)
 
-    screenTexture = gl.createTexture()
-    gl.bindTexture(gl.TEXTURE_2D, screenTexture)
+    fallbackTexture = gl.createTexture()
+    gl.bindTexture(gl.TEXTURE_2D, fallbackTexture)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+    gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA,
+        1,
+        1,
+        0,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        new Uint8Array([0, 0, 0, 255])
+    )
 }
 
 function applyShaderSources(vertexSource, fragmentSource) {
     if (!gl) return
-    ensurePostFX()
+    ensureRenderer()
     var nextProgram = buildShaderProgram(vertexSource, fragmentSource)
     if (shaderProgram && shaderProgram.handle) {
         gl.deleteProgram(shaderProgram.handle)
     }
     shaderProgram = nextProgram
     setShaderStatus('GLSL 編譯成功。')
-    drawNeeded = true
 }
 
 function loadDefaultShaderSources() {
-    setEditorValue('viewerVertexShader', defaultVertexShader)
-    setEditorValue('viewerFragmentShader', defaultFragmentShader)
+    setEditorValue('shaderEditorVertexShader', defaultVertexShader)
+    setEditorValue('shaderEditorFragmentShader', defaultFragmentShader)
     applyShaderSources(defaultVertexShader, defaultFragmentShader)
 }
 
 function applyShaderFromEditor() {
-    var vertexSource = getEditorValue('viewerVertexShader')
-    var fragmentSource = getEditorValue('viewerFragmentShader')
+    var vertexSource = getEditorValue('shaderEditorVertexShader')
+    var fragmentSource = getEditorValue('shaderEditorFragmentShader')
     if (!vertexSource || !fragmentSource) return
 
     try {
@@ -317,15 +260,12 @@ function applyShaderFromEditor() {
     }
 }
 
-function drawPostFX(now) {
-    if (!gl || !shaderProgram || !screenTexture || !quadBuffer) return
+function draw(now) {
+    if (!gl || !shaderProgram || !quadBuffer) return
 
     gl.viewport(0, 0, canvas.width, canvas.height)
     gl.clearColor(0, 0, 0, 1)
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-
-    gl.bindTexture(gl.TEXTURE_2D, screenTexture)
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, sourceCanvas)
 
     gl.useProgram(shaderProgram.handle)
     gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer)
@@ -334,7 +274,7 @@ function drawPostFX(now) {
 
     if (shaderProgram.uScene) {
         gl.activeTexture(gl.TEXTURE0)
-        gl.bindTexture(gl.TEXTURE_2D, screenTexture)
+        gl.bindTexture(gl.TEXTURE_2D, fallbackTexture)
         gl.uniform1i(shaderProgram.uScene, 0)
     }
     if (shaderProgram.uResolution) {
@@ -348,106 +288,62 @@ function drawPostFX(now) {
 }
 
 function bindCanvas() {
-    var nextCanvas = $('view')
+    var nextCanvas = $('shaderView')
     if (!nextCanvas || nextCanvas === canvas) return
-
     canvas = nextCanvas
     gl = canvas.getContext('webgl', { alpha: false, antialias: true })
-    proj = new Projectron(sourceCanvas, size)
-    window.p = proj
     quadBuffer = null
-    screenTexture = null
     shaderProgram = null
+    fallbackTexture = null
     resizeCanvasSquare()
-    ensurePostFX()
+    ensureRenderer()
     loadDefaultShaderSources()
-
-    if (canvas.dataset.viewerReady !== 'true') {
-        canvas.dataset.viewerReady = 'true'
-        canvas.addEventListener('mousedown', startDrag)
-        canvas.addEventListener('touchstart', startDrag)
-    }
 }
 
 function bindPanel() {
-    var panel = document.querySelector('[data-panel="genviewer"]')
-    if (!panel || panel.dataset.viewerPanelReady === 'true') return
-    panel.dataset.viewerPanelReady = 'true'
+    var panel = document.querySelector('[data-panel="glsleditor"]')
+    if (!panel || panel.dataset.shaderEditorPanelReady === 'true') return
+    panel.dataset.shaderEditorPanelReady = 'true'
 
-    var input = $('viewModelPlyInput')
-    var button = $('loadPlyBtn')
-    var applyButton = $('applyViewerShader')
-    var resetButton = $('resetViewerShader')
+    var applyButton = $('applyShaderEditorShader')
+    var resetButton = $('resetShaderEditorShader')
 
-    bindEditor('viewerVertexShader')
-    bindEditor('viewerFragmentShader')
-    bindShaderFileTools('Vertex', 'viewerVertexShader', 'viewer-vertex.glsl')
-    bindShaderFileTools('Fragment', 'viewerFragmentShader', 'viewer-fragment.glsl')
-
-    if (button && input) {
-        button.addEventListener('click', () => {
-            input.value = ''
-            input.click()
-        })
-
-        input.addEventListener('change', ev => {
-            var file = ev.target.files && ev.target.files[0]
-            loadTextFromFile(file, text => {
-                if (proj && proj.importPLY(text)) {
-                    drawNeeded = true
-                }
-            })
-        })
-    }
+    bindEditor('shaderEditorVertexShader')
+    bindEditor('shaderEditorFragmentShader')
+    bindShaderFileTools('Vertex', 'shaderEditorVertexShader', 'shader-editor-vertex.glsl')
+    bindShaderFileTools('Fragment', 'shaderEditorFragmentShader', 'shader-editor-fragment.glsl')
 
     if (applyButton) {
         applyButton.addEventListener('click', applyShaderFromEditor)
     }
 
     if (resetButton) {
-        resetButton.addEventListener('click', () => {
-            loadDefaultShaderSources()
-        })
+        resetButton.addEventListener('click', loadDefaultShaderSources)
     }
 }
 
-function initializeViewerPanel() {
-    if (!isViewerPanelActive()) return
+function initializeEditorPanel() {
+    if (!isEditorPanelActive()) return
     bindCanvas()
     bindPanel()
     resizeCanvasSquare()
     refreshEditors()
-    ensurePostFX()
+    ensureRenderer()
     if (!shaderProgram) {
         loadDefaultShaderSources()
     }
-    drawNeeded = true
 }
 
 function render() {
-    var now = performance.now()
-    var needsTimeRefresh = !!(shaderProgram && shaderProgram.uTime)
-    if (isViewerPanelActive() && proj && (drawNeeded || needsTimeRefresh)) {
-        proj.draw(-cameraRot[0], -cameraRot[1])
-        drawPostFX(now)
-        drawNeeded = false
+    if (isEditorPanelActive() && gl) {
+        draw(performance.now())
     }
     requestAnimationFrame(render)
 }
 
-if (canvas) {
-    canvas.dataset.viewerReady = 'true'
-    canvas.addEventListener('mousedown', startDrag)
-    canvas.addEventListener('touchstart', startDrag)
-}
-
-document.body.addEventListener('mouseup', stopDrag)
-document.body.addEventListener('touchend', stopDrag)
-document.body.addEventListener('mousemove', drag)
-document.body.addEventListener('touchmove', drag)
 window.addEventListener('resize', resizeCanvasSquare)
 window.addEventListener('resize', refreshEditors)
-window.addEventListener('projectron-panel-change', initializeViewerPanel)
+window.addEventListener('projectron-panel-change', initializeEditorPanel)
 
-initializeViewerPanel()
+initializeEditorPanel()
 requestAnimationFrame(render)

@@ -5,7 +5,8 @@ var resumeOnReturn = false
 var runtimePanels = {
     gensolo: true,
     genmix: true,
-    plyviewer: true
+    genviewer: true,
+    glsleditor: true
 }
 var pageCache = {}
 var pageLoads = {}
@@ -282,7 +283,8 @@ function ensureRuntime(name) {
         var script = document.createElement('script')
         script.src =
             (name === 'gensolo' || name === 'genmix') ? 'maker-bundle.js' :
-            (name === 'plyviewer') ? 'viewer-bundle.js' :
+            (name === 'genviewer') ? 'viewer-bundle.js' :
+            (name === 'glsleditor') ? 'editor-bundle.js' :
             ''
         script.onload = resolve
         script.onerror = function () {

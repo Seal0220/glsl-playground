@@ -1,0 +1,91 @@
+<section class="panel active" data-panel="genviewer">
+  <div class="page">
+    <div class="page-head">
+      <div>
+        <div class="pill">Tool 03</div>
+        <h2>GenViewer</h2>
+        <p class="meta">基因演算結果的 3D 預覽工具，支援匯入 `.ply` 檔案。</p>
+      </div>
+    </div>
+
+    <div class="genmix-grid">
+      <div class="canvas-stack">
+        <div class="card">
+          <div class="card-head"><span>預覽窗</span></div>
+          <div class="canvas-panel">
+            <div class="canvas-toolbar">
+              <div class="canvas-toolbar-row"></div>
+            </div>
+            <canvas id="view" width="500" height="500"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-head"><span>模型載入</span></div>
+          <div class="stack">
+            <button id="loadPlyBtn" type="button">選擇 PLY 檔案</button>
+            <input id="viewModelPlyInput" type="file" accept=".ply,model/ply,text/plain" hidden>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><span>說明</span></div>
+          <div class="stack">
+            <p class="meta">預覽器將讀取檔案中的三角面資料顯示（如 GenSolo、GenMix），如果檔案沒有面資料，或面不是三角形，將無法顯示。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="plyviewer-editor-block">
+      <div class="card">
+        <div class="card-head"><span>GLSL 編輯器</span></div>
+        <div class="transfer-grid">
+          <div class="transfer-editor">
+            <div class="shader-editor-head">
+              <label>Vertex Shader</label>
+              <div class="shader-editor-actions">
+                <button id="importViewerVertexShader" type="button">匯入</button>
+                <button id="saveViewerVertexShader" type="button">保存</button>
+                <input id="viewerVertexShaderFile" type="file" accept=".glsl,.vert,.vs,.txt,text/plain" hidden>
+              </div>
+            </div>
+            <div class="stack">
+              <div id="viewerVertexShader" class="shader-editor-host" aria-label="Vertex Shader editor"></div>
+            </div>
+          </div>
+          <div class="transfer-editor">
+            <div class="shader-editor-head">
+              <label>Fragment Shader</label>
+              <div class="shader-editor-actions">
+                <button id="importViewerFragmentShader" type="button">匯入</button>
+                <button id="saveViewerFragmentShader" type="button">保存</button>
+                <input id="viewerFragmentShaderFile" type="file" accept=".glsl,.frag,.fs,.txt,text/plain" hidden>
+              </div>
+            </div>
+            <div class="stack">
+              <div id="viewerFragmentShader" class="shader-editor-host" aria-label="Fragment Shader editor"></div>
+            </div>
+          </div>
+          <div class="transfer-actions">
+            <div class="transfer-group">
+              <label>操作</label>
+              <div class="stack">
+                <button id="applyViewerShader" type="button">套用 GLSL</button>
+                <button id="resetViewerShader" type="button">重設</button>
+              </div>
+            </div>
+            <div class="transfer-group">
+              <label>狀態</label>
+              <div class="stack">
+                <pre id="viewerShaderStatus" class="shader-status">尚未編譯。</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

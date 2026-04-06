@@ -1,8 +1,10 @@
-:root {
+      :root {
         --bg-page: #0a0a0a;
         --bg-panel: #000000;
         --bg-card: rgb(6, 6, 6);
         --bg-panel-soft: rgb(20, 20, 20);
+        --control-bg: rgb(20, 20, 20);
+        --control-border-hover: rgba(255, 255, 255, 0.8);
         --text-main: #ffffff;
         --text-muted: #ffffff;
         --text-dim: #ffffff;
@@ -67,7 +69,7 @@
 
       button {
         appearance: none;
-        background: transparent;
+        background: var(--control-bg);
         padding: 0.72rem 1rem;
         font-weight: 600;
         letter-spacing: 0.08em;
@@ -78,47 +80,51 @@
 
       button:hover,
       button:focus-visible {
-        background: rgba(255, 255, 255, 0.08);
+        background: var(--control-bg);
+        border-color: var(--control-border-hover);
         color: #ffffff;
         transform: translateY(-1px);
       }
 
       .button-run {
-        border-color: #2dff72;
-        background: rgba(45, 255, 114, 0.22);
+        border-color: var(--white-soft);
+        background: var(--control-bg);
         color: #ffffff;
-        box-shadow: inset 0 0 0 1px rgba(45, 255, 114, 0.2);
+        box-shadow: none;
       }
 
       .button-run:hover,
       .button-run:focus-visible {
-        background: rgba(45, 255, 114, 0.34);
+        background: var(--control-bg);
+        border-color: var(--control-border-hover);
         color: #ffffff;
       }
 
       .button-pause {
-        border-color: #ff9a2d;
-        background: rgba(255, 154, 45, 0.22);
+        border-color: var(--white-soft);
+        background: var(--control-bg);
         color: #ffffff;
-        box-shadow: inset 0 0 0 1px rgba(255, 154, 45, 0.2);
+        box-shadow: none;
       }
 
       .button-pause:hover,
       .button-pause:focus-visible {
-        background: rgba(255, 154, 45, 0.34);
+        background: var(--control-bg);
+        border-color: var(--control-border-hover);
         color: #ffffff;
       }
 
       .button-clear {
-        border-color: #ff4d4d;
-        background: rgba(255, 77, 77, 0.22);
+        border-color: var(--white-soft);
+        background: var(--control-bg);
         color: #ffffff;
-        box-shadow: inset 0 0 0 1px rgba(255, 77, 77, 0.2);
+        box-shadow: none;
       }
 
       .button-clear:hover,
       .button-clear:focus-visible {
-        background: rgba(255, 77, 77, 0.34);
+        background: var(--control-bg);
+        border-color: var(--control-border-hover);
         color: #ffffff;
       }
 
@@ -135,9 +141,20 @@
       select,
       textarea {
         width: 100%;
-        background: var(--bg-panel-soft);
+        background: var(--control-bg);
         padding: 0.6rem 0.72rem;
         transition: background-color .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease;
+      }
+
+      input[type='text']:hover,
+      input[type='text']:focus-visible,
+      input[type='number']:hover,
+      input[type='number']:focus-visible,
+      select:hover,
+      select:focus-visible {
+        background: var(--control-bg);
+        border-color: var(--control-border-hover);
+        transform: translateY(-1px);
       }
 
       input[type='number'] {
@@ -166,7 +183,7 @@
         display: grid;
         grid-template-rows: 1fr 1fr;
         border-left: 1px solid var(--white-soft);
-        background: rgb(14, 14, 14);
+        background: var(--control-bg);
       }
 
       .number-stepper button {
@@ -175,7 +192,7 @@
         padding: 0;
         border: 0;
         border-bottom: 1px solid var(--white-soft);
-        background: transparent;
+        background: var(--control-bg);
         transform: none;
       }
 
@@ -205,7 +222,9 @@
 
       .number-stepper button:hover,
       .number-stepper button:focus-visible {
-        background: rgba(255, 255, 255, 0.08);
+        background: var(--control-bg);
+        border-color: var(--control-border-hover);
+        transform: translateY(-1px);
       }
 
       .number-stepper button:hover::before,
@@ -215,7 +234,7 @@
 
       select {
         appearance: none;
-        background-color: var(--bg-panel-soft);
+        background-color: var(--control-bg);
         background-image:
           linear-gradient(45deg, transparent 50%, #ffffff 50%),
           linear-gradient(135deg, #ffffff 50%, transparent 50%),
@@ -231,14 +250,14 @@
       }
 
       select:hover {
-        background-color: rgba(255, 255, 255, 0.05);
-        border-color: #ffffff;
+        background-color: var(--control-bg);
+        border-color: var(--control-border-hover);
         box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
       }
 
       select:focus-visible {
-        background-color: rgba(255, 255, 255, 0.08);
-        border-color: #ffffff;
+        background-color: var(--control-bg);
+        border-color: var(--control-border-hover);
         box-shadow: inset 0 0 0 1px var(--white-soft);
       }
 
@@ -270,7 +289,7 @@
         align-items: center;
         justify-content: space-between;
         text-align: left;
-        background: var(--bg-panel-soft);
+        background: var(--control-bg);
         box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
         padding-right: 48px;
       }
@@ -291,10 +310,11 @@
       .custom-select-button:hover,
       .custom-select-button:focus-visible,
       .custom-select.is-open .custom-select-button {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: #ffffff;
+        background: var(--control-bg);
+        border-color: var(--control-border-hover);
         color: #ffffff;
         box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+        transform: translateY(-1px);
       }
 
       .custom-select.is-open .custom-select-button::after {
@@ -338,7 +358,7 @@
         border: 0;
         border-bottom: 1px solid var(--white-soft);
         text-align: left;
-        background: transparent;
+        background: var(--control-bg);
         color: #ffffff;
         letter-spacing: 0.08em;
         transform: none;
@@ -360,8 +380,10 @@
       .custom-select-option:hover,
       .custom-select-option:focus-visible,
       .custom-select-option.is-selected {
-        background: rgba(255, 255, 255, 0.1);
+        background: var(--control-bg);
+        border-color: var(--control-border-hover);
         color: #ffffff;
+        transform: translateY(-1px);
       }
 
       .custom-select-option.is-selected::after {
@@ -373,7 +395,7 @@
       #uploadTrigger2 {
         width: 100%;
         justify-content: center;
-        background: var(--bg-panel-soft);
+        background: var(--control-bg);
         box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
       }
 
@@ -543,15 +565,23 @@
         width: 100%;
         text-align: left;
         padding: 1rem;
-        background: transparent;
+        background: var(--control-bg);
         align-items: start;
         transition: background-color .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease;
       }
 
+      .nav-btn:hover,
+      .nav-btn:focus-visible {
+        background: var(--control-bg);
+        border-color: var(--control-border-hover);
+        transform: translateY(-1px);
+      }
+
       .nav-btn.active {
-        background: rgba(255, 255, 255, 0.08);
+        background: var(--control-bg);
+        border-color: var(--control-border-hover);
         color: #ffffff;
-        transform: translateX(8px);
+        transform: translateY(-1px);
       }
 
       .nav-btn.active .meta,
@@ -571,7 +601,7 @@
         display: grid;
         place-items: center;
         border: 1px solid currentColor;
-        background: transparent;
+        background: var(--control-bg);
         font: 600 12px/1 var(--mono);
       }
 
@@ -870,7 +900,9 @@
       }
 
       #view2d,
-      #view3d {
+      #view3d,
+      #view,
+      #shaderView {
         width: 100%;
         display: block;
         margin: 0 auto;
@@ -918,7 +950,7 @@
         display: grid;
         gap: 0.7rem;
         padding: 0.85rem;
-        background: rgb(10, 10, 10);
+        background: var(--bg-panel-soft);
         border: 1px solid var(--white-soft);
       }
 
@@ -936,7 +968,7 @@
       .transfer-group button {
         width: 100%;
         justify-content: center;
-        background: var(--bg-panel-soft);
+        background: var(--control-bg);
       }
 
       .transfer-editor {
@@ -945,7 +977,175 @@
 
       .transfer-editor textarea {
         min-height: 220px;
-        background: rgb(6, 6, 6);
+        background: var(--control-bg);
+      }
+
+      .shader-editor-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 0.55rem;
+      }
+
+      .shader-editor-head label {
+        margin-bottom: 0;
+      }
+
+      .shader-editor-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        margin-left: auto;
+      }
+
+      .shader-editor-host {
+        display: block;
+        position: relative;
+        width: 100%;
+        height: 320px;
+        min-height: 320px;
+        border: 1px solid var(--white-soft);
+        background: var(--control-bg);
+        overflow: hidden;
+        transition: border-color .2s ease, transform .2s ease;
+      }
+
+      .shader-editor-host:hover,
+      .shader-editor-host:focus-within {
+        border-color: var(--control-border-hover);
+        transform: translateY(-1px);
+      }
+
+      .shader-editor-host.ace_editor {
+        width: 100%;
+        height: 320px;
+        min-height: 320px;
+        background: var(--control-bg);
+        color: #f3f4f6;
+        font: 400 13px/1.55 var(--mono);
+      }
+
+      .shader-editor-host.ace_editor,
+      .shader-editor-host.ace_editor * {
+        box-sizing: content-box;
+      }
+
+      .shader-editor-host .ace_layer,
+      .shader-editor-host .ace_gutter-layer,
+      .shader-editor-host .ace_text-layer,
+      .shader-editor-host .ace_marker-layer,
+      .shader-editor-host .ace_cursor-layer {
+        box-sizing: content-box;
+      }
+
+      .shader-editor-host .ace_content {
+        min-width: 100%;
+      }
+
+      .shader-editor-host .ace_gutter {
+        background: rgb(10, 10, 10);
+        color: rgba(255, 255, 255, 0.45);
+        border-right: 1px solid var(--white-soft);
+      }
+
+      .shader-editor-host .ace_gutter-active-line {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .shader-editor-host .ace_scroller {
+        background: var(--control-bg);
+      }
+
+      .shader-editor-host .ace_marker-layer .ace_active-line {
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .shader-editor-host .ace_marker-layer .ace_selection {
+        background: rgba(255, 255, 255, 0.14);
+      }
+
+      .shader-editor-host .ace_cursor {
+        color: #ffffff;
+      }
+
+      .shader-editor-host .ace_print-margin {
+        display: none;
+      }
+
+      .shader-editor-host .ace_keyword {
+        color: #7dd3fc;
+      }
+
+      .shader-editor-host .ace_storage,
+      .shader-editor-host .ace_support.ace_type {
+        color: #f9a8d4;
+      }
+
+      .shader-editor-host .ace_constant.ace_numeric,
+      .shader-editor-host .ace_constant.ace_language {
+        color: #fde68a;
+      }
+
+      .shader-editor-host .ace_comment {
+        color: #6ee7b7;
+      }
+
+      .shader-editor-host .ace_support.ace_function,
+      .shader-editor-host .ace_entity.ace_name.ace_function {
+        color: #fca5a5;
+      }
+
+      .shader-editor-host .ace_identifier,
+      .shader-editor-host .ace_paren {
+        color: #f3f4f6;
+      }
+
+      .shader-editor-host .ace_scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.45) rgb(10, 10, 10);
+      }
+
+      .shader-editor-host .ace_scrollbar::-webkit-scrollbar,
+      .shader-status::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+      }
+
+      .shader-editor-host .ace_scrollbar::-webkit-scrollbar-track,
+      .shader-status::-webkit-scrollbar-track {
+        background: rgb(10, 10, 10);
+        border-left: 1px solid var(--white-soft);
+      }
+
+      .shader-editor-host .ace_scrollbar::-webkit-scrollbar-thumb,
+      .shader-status::-webkit-scrollbar-thumb {
+        background: rgb(28, 28, 28);
+        border: 1px solid rgba(255, 255, 255, 0.45);
+      }
+
+      .shader-editor-host .ace_scrollbar::-webkit-scrollbar-thumb:hover,
+      .shader-status::-webkit-scrollbar-thumb:hover {
+        background: rgb(40, 40, 40);
+        border-color: rgba(255, 255, 255, 0.7);
+      }
+
+      .shader-editor-host .ace_scrollbar-corner,
+      .shader-status::-webkit-scrollbar-corner {
+        background: rgb(10, 10, 10);
+      }
+
+      .shader-status {
+        margin: 0;
+        min-height: 160px;
+        padding: 0.85rem 1rem;
+        border: 1px solid var(--white-soft);
+        background: var(--control-bg);
+        color: #ffffff;
+        white-space: pre-wrap;
+        overflow: auto;
+        font: 400 13px/1.55 var(--mono);
       }
 
       .stats {
@@ -960,7 +1160,7 @@
         justify-content: space-between;
         min-height: 110px;
         padding: 0.72rem;
-        background: var(--bg-panel-soft);
+        background: var(--control-bg);
         border: 1px solid var(--white-soft);
         transition: background-color .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease;
       }
@@ -974,7 +1174,7 @@
       .stat input {
         border: 1px solid var(--white-soft);
         padding: 0.6rem 0.72rem;
-        background: rgb(6, 6, 6);
+        background: var(--control-bg);
         text-align: left;
         font-family: var(--mono);
         font-size: 1.15rem;
@@ -1008,6 +1208,9 @@
       }
 
       .blank-surface {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         min-height: 360px;
         border: 1px dashed var(--white-soft);
         background:
@@ -1017,9 +1220,96 @@
         background-size: 26px 26px;
       }
 
+      .blank-surface img {
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        display: block;
+      }
+
       .blank-notes {
         display: grid;
         gap: 0.8rem;
+      }
+
+      .plyviewer-editor-block {
+        width: 100%;
+        margin-top: 1rem;
+      }
+
+      .shader-preview-card {
+        width: fit-content;
+        max-width: 100%;
+      }
+
+      .shader-preview-card .canvas-panel {
+        width: fit-content;
+        max-width: 100%;
+      }
+
+      .plyviewer-editor-block .transfer-actions {
+        grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+        align-items: stretch;
+      }
+
+      .plyviewer-editor-block .transfer-group {
+        height: 100%;
+      }
+
+      #applyViewerShader,
+      #applyShaderEditorShader {
+        background: #ffffff;
+        color: #000000;
+        border-color: #ffffff;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+      }
+
+      #applyViewerShader:hover,
+      #applyViewerShader:focus-visible,
+      #applyShaderEditorShader:hover,
+      #applyShaderEditorShader:focus-visible {
+        background: rgb(235, 235, 235);
+        color: #000000;
+        border-color: #ffffff;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.22);
+      }
+
+      [data-panel="gensolo"] .button-run,
+      [data-panel="genmix"] .button-run {
+        background: rgb(24, 120, 56);
+        color: #ffffff;
+        border-color: rgb(46, 170, 86);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+      }
+
+      [data-panel="gensolo"] .button-run:hover,
+      [data-panel="gensolo"] .button-run:focus-visible,
+      [data-panel="genmix"] .button-run:hover,
+      [data-panel="genmix"] .button-run:focus-visible {
+        background: rgb(34, 148, 72);
+        color: #ffffff;
+        border-color: rgb(118, 236, 155);
+        box-shadow: 0 0 0 1px rgba(118, 236, 155, 0.22);
+      }
+
+      [data-panel="gensolo"] .button-clear,
+      [data-panel="genmix"] .button-clear {
+        background: rgb(132, 24, 32);
+        color: #ffffff;
+        border-color: rgb(196, 56, 68);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+      }
+
+      [data-panel="gensolo"] .button-clear:hover,
+      [data-panel="gensolo"] .button-clear:focus-visible,
+      [data-panel="genmix"] .button-clear:hover,
+      [data-panel="genmix"] .button-clear:focus-visible {
+        background: rgb(164, 32, 42);
+        color: #ffffff;
+        border-color: rgb(255, 128, 138);
+        box-shadow: 0 0 0 1px rgba(255, 128, 138, 0.22);
       }
 
       @media (max-width: 1080px) {
