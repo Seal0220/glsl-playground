@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "start": "cd demo && webpack-dev-server",
-    "build": "cd demo && set NODE_OPTIONS=--openssl-legacy-provider&& npx webpack --env.production"
+    "build": "node scripts/build.js"
   },
   "dependencies": {
     "ace-builds": "^1.43.6",
