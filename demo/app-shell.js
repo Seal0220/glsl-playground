@@ -3,6 +3,7 @@ var main = document.querySelector('.content')
 var current = 'gensolo'
 var resumeOnReturn = false
 var activationToken = 0
+var buildVersion = window.__projectronBuild || '20260406-2135'
 var runtimePanels = {
     gensolo: true,
     genmix: true,
@@ -20,6 +21,11 @@ var pageCache = {}
 var pageLoads = {}
 var runtimeLoads = {}
 
+function withBuildVersion(path) {
+    var separator = path.indexOf('?') === -1 ? '?' : '&'
+    return path + separator + 'v=' + encodeURIComponent(buildVersion)
+}
+
 function validPanel(name) {
     return navs.some(function (nav) { return nav.dataset.panel === name }) ? name : 'gensolo'
 }
@@ -29,7 +35,7 @@ function panelFromHash() {
 }
 
 function panelPath(name) {
-    return './pages/' + name + '.html'
+    return withBuildVersion('./pages/' + name + '.html')
 }
 
 function getPanelPausedCheckbox(panel) {
@@ -297,24 +303,25 @@ function loadPanel(name) {
 function ensureRuntime(name) {
     var bundle = runtimeBundles[name]
     if (!bundle) return Promise.resolve()
-    if (runtimeLoads[bundle]) return runtimeLoads[bundle]
+    var bundleSrc = withBuildVersion(bundle)
+    if (runtimeLoads[bundleSrc]) return runtimeLoads[bundleSrc]
 
-    runtimeLoads[bundle] = new Promise(function (resolve, reject) {
+    runtimeLoads[bundleSrc] = new Promise(function (resolve, reject) {
         var script = document.createElement('script')
-        script.src = bundle
-        script.dataset.runtimeBundle = bundle
+        script.src = bundleSrc
+        script.dataset.runtimeBundle = bundleSrc
         script.onload = function () {
             script.dataset.runtimeLoaded = 'true'
             resolve()
         }
         script.onerror = function () {
-            delete runtimeLoads[bundle]
+            delete runtimeLoads[bundleSrc]
             reject(new Error('Failed to load runtime bundle: ' + name))
         }
         document.body.appendChild(script)
     })
 
-    return runtimeLoads[bundle]
+    return runtimeLoads[bundleSrc]
 }
 
 function syncRuntimeBeforeLeave(nextPanel) {

@@ -1250,6 +1250,10 @@
         object-fit: contain;
         border: 1px solid var(--white-soft);
         background: var(--bg-panel-soft);
+        transition:
+          transform 180ms ease,
+          border-color 180ms ease,
+          box-shadow 180ms ease;
       }
 
       .sync-note {

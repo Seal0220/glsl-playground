@@ -16,11 +16,13 @@ function $(s) {
 var panelConfigs = {
     gensolo: {
         defaultMainSrc: './assets/images/seal_the_napoleon.png',
-        defaultSideSrc: null
+        defaultSideSrc: null,
+        defaultPlySrc: './assets/ply/seal_the_napoleon.ply'
     },
     genmix: {
         defaultMainSrc: './assets/images/1.png',
-        defaultSideSrc: './assets/images/TS.jpg'
+        defaultSideSrc: './assets/images/TS.jpg',
+        defaultPlySrc: null
     }
 }
 
@@ -176,6 +178,31 @@ function loadDefaultImages(config) {
     }
 }
 
+function loadDefaultPly(config) {
+    if (!config || !config.defaultPlySrc) return
+
+    var loadToken = toolLoadToken
+    fetch(config.defaultPlySrc)
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to load default PLY: ' + config.defaultPlySrc)
+            return response.text()
+        })
+        .then(text => {
+            if (loadToken !== toolLoadToken || activeTool !== getActivePanel()) return
+            var res = proj.importPLY(text)
+            if (!res) return
+            resetGenerationCounters()
+            var modelData = $('modelData')
+            if (modelData) modelData.value = ''
+            draw2dNeeded = true
+            markViewerDirty()
+            syncViewerFromMain(true)
+        })
+        .catch(error => {
+            console.warn(error && error.message ? error.message : error)
+        })
+}
+
 function draw2d() {
     proj._drawScratchImage()
 }
@@ -310,6 +337,7 @@ function configureTool(panelName, forceReset) {
     clearSidePreview()
     resetProject()
     loadDefaultImages(config)
+    loadDefaultPly(config)
 }
 
 function bindToolInputs() {
