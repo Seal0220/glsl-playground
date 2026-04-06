@@ -79,7 +79,7 @@ var objbasicModes = {
     },
     glass: {
         label: 'Glass',
-        description: '全光滑透明玻璃。',
+        description: '全光滑的透明玻璃樣式。',
         vertexUrl: 'shaders/objbasic-glass.vert.glsl',
         fragmentUrl: 'shaders/objbasic-glass.frag.glsl'
     },
