@@ -1,0 +1,156 @@
+<section class="panel active" data-panel="genmix">
+  <div class="page">
+    <div class="page-head">
+      <div>
+        <div class="pill">Tool 01</div>
+        <h2>GenMix</h2>
+        <div class="meta doc-intro">
+          <p>本專案為 <a href="https://github.com/fenomas/glsl-projectron" target="_blank"
+              rel="noreferrer noopener">fenomas/glsl-projectron</a> 的延伸版本。</p>
+          <p>在原本「單一視角、多邊形演化逼近影像」的基礎上，加入主視圖（正面）＋側視圖（繞 Y 軸 +90°）的雙視角，以及兩張目標圖像的幾何平均分數作為適應度。</p>
+        </div>
+
+        <div class="meta doc-section">
+          <details class="doc-toggle">
+            <summary class="doc-button" aria-label="展開或收合說明"></summary>
+            <div class="doc-body">
+              <p>GLSL-Projectron 是一個使用 WebGL / GPU 的圖像重建實驗。</p>
+              <ul class="doc-list">
+                <li>在 3D 空間中隨機生成大量三角形（多邊形雲）。</li>
+                <li>每一代透過突變（mutate）+ 篩選（保留分數較高者）更新多邊形。</li>
+                <li>將 3D 場景投影到 2D 平面後，與目標圖片比較差異，得到分數（score）。</li>
+                <li>分數越高代表越接近目標影像。</li>
+              </ul>
+              <h3>本 fork 版本中</h3>
+              <ul class="doc-list">
+                <li>第一張圖片為「主視圖」（正面 Frontal View）。</li>
+                <li>第二張圖片為「側視圖」（固定繞 Y 軸 +90° 之右側 View）。</li>
+              </ul>
+              <p>每一代演化時，會同時：</p>
+              <ul class="doc-list">
+                <li>用正面 camera 畫出 scratch1，與正面參考圖比較得分 scoreFront。</li>
+                <li>用側面 camera 畫出 scratch2，與側面參考圖比較得分 scoreSide。</li>
+                <li>將兩者做幾何平均：<code>totalScore = sqrt(scoreFront * scoreSide)</code>
+                  作為最終分數。</li>
+                <li>若新分數較好，或在容忍度內且多邊形數更少，就保留這一代的突變。</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <input type="checkbox" id="paused" checked hidden>
+        <div class="action-group">
+          <button id="pauseBtn" class="button-run" type="button" data-action="toggle-run">運行</button>
+          <button id="resetBtn" class="button-clear" type="button">清除</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="genmix-grid">
+      <div class="canvas-stack">
+        <div class="card">
+          <div class="card-head"><span>視窗區</span></div>
+          <div class="canvas-panel">
+            <div class="canvas-toolbar">
+              <div class="canvas-toolbar-row"></div>
+            </div>
+            <canvas id="view3d" width="500" height="500"></canvas>
+            <label class="toolbar-field">
+              <span>顯示模式</span>
+              <select id="display2dMode">
+                <option value="front" selected>主視角</option>
+                <option value="side">側視角</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><span>視圖</span></div>
+          <div class="thumbs">
+            <div class="stack">
+              <label>主視圖</label>
+              <img id="thumbMain" class="thumb" alt="主視圖縮圖">
+              <button id="uploadTrigger" type="button">+ 選擇主視圖</button>
+              <input id="imageInput" type="file" accept="image/*" hidden>
+            </div>
+            <div class="stack">
+              <label>側視圖</label>
+              <img id="thumbSide" class="thumb" alt="側視圖縮圖">
+              <button id="uploadTrigger2" type="button">+ 選擇側視圖</button>
+              <input id="imageInput2" type="file" accept="image/*" hidden>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <div class="card-head"><span>進度 / 模型</span></div>
+          <div class="stats">
+            <div class="stat"><label>多邊形數</label><input id="polys" type="text" readonly></div>
+            <div class="stat"><label>迭代數</label><input id="gens" type="text" readonly></div>
+            <div class="stat"><label>代 / 秒</label><input id="gps" type="text" readonly></div>
+            <div class="stat"><label>模型多邊形數</label><input id="modelPolys" type="text" readonly></div>
+            <div class="stat"><label>模型迭代數</label><input id="modelGens" type="text" readonly></div>
+            <div class="stat"><label>模型分數</label><input id="modelScore" type="text" readonly></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><span>演化參數</span></div>
+          <div class="control-grid">
+            <label>每幀演化次數<select id="gensPerFrame">
+                <option>1</option>
+                <option>10</option>
+                <option selected="true">20</option>
+                <option>50</option>
+                <option>100</option>
+              </select></label>
+            <label>較少多邊形容忍度<input type="number" id="preferFewer" value="0.001" min="0" max="1"
+                step="0.001"></label>
+            <label>Alpha 範圍
+              <div class="range-pair">
+                <input type="number" id="minAlpha" value="0.1" min="0" max="1" step="0.01">
+                <span class="range-separator">~</span>
+                <input type="number" id="maxAlpha" value="0.5" min="0" max="1" step="0.01">
+              </div>
+            </label>
+            <label>調整幅度<input type="number" id="adjust" value="0.5" min="0.01" max="1" step="0.01"></label>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><span>資料匯入 / 匯出</span></div>
+          <div class="transfer-grid">
+            <div class="transfer-editor">
+              <label>資料內容</label>
+              <div class="stack">
+                <textarea id="modelData" rows="8" cols="30"></textarea>
+              </div>
+            </div>
+            <div class="transfer-actions">
+              <div class="transfer-group">
+                <label>匯出</label>
+                <div class="stack">
+                  <button id="exportModelData" type="button">匯出資料</button>
+                  <button id="exportModelPly" type="button">下載 PLY</button>
+                </div>
+              </div>
+              <div class="transfer-group">
+                <label>匯入</label>
+                <div class="stack">
+                  <button id="importModelData" type="button">套用資料</button>
+                  <button id="importModelPly" type="button">導入 PLY</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <input id="modelPlyInput" type="file" accept=".ply,model/ply,text/plain" hidden>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

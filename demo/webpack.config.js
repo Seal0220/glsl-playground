@@ -26,6 +26,7 @@ module.exports = (env) => ({
     },
 
     entry: {
+        app: './app-shell.js',
         maker: './maker.js',
         viewer: './viewer.js',
     },
