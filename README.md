@@ -2,7 +2,6 @@
 
 GLSL Playground 是一個以 WebGL 與 GLSL 為核心的互動式實驗專案，整合了多邊形演化、模型預覽、Shader 編輯與材質測試等功能。專案以靜態網站形式輸出於 `docs/`，可作為教學展示、圖形計算課程作業、WebGL 實驗平台，或作為後續擴充工具頁面的基礎。
 
-本專案建立在 [fenomas/glsl-projectron](https://github.com/fenomas/glsl-projectron) 的概念之上，延伸為一個多工具入口網站。除了保留以 GPU 進行多邊形演化逼近目標影像的核心機制，也加入雙視角評分、PLY 匯入匯出、即時 GLSL 編輯，以及 OBJ 模型著色測試等功能。
 
 ## Features
 
